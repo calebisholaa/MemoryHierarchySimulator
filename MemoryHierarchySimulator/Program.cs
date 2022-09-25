@@ -8,8 +8,15 @@ namespace MemoryHierarchySimulator
 {
     internal class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
+
+            OpenFile openfile = new OpenFile();
+            openfile.Open();
+
+            Console.ReadLine();
+
         }
     }
 }
