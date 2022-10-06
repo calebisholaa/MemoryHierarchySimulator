@@ -12,6 +12,7 @@ namespace MemoryHierarchySimulator
         [STAThread]
         static void Main(string[] args)
         {
+            Intro();
 
             OpenFile openfile = new OpenFile();
             OpenTraceFile openTraceFile = new OpenTraceFile();

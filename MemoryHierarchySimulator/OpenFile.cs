@@ -319,7 +319,7 @@ namespace MemoryHierarchy
             double temp = 0;
             temp = i;
             temp = Math.Log(temp, 2);
-           // temp = Math.Log2(temp);
+            //temp = Math.Log2(temp);
             return temp;
         }
     }
