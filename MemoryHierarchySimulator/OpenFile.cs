@@ -45,7 +45,7 @@ namespace MemoryHierarchy
             }
 
             fileContents = File.ReadAllText(filePath).Split('\n');
-            foreach(string line in fileContents)
+            foreach (string line in fileContents)
             {
                 contents += line;
             }
@@ -54,13 +54,13 @@ namespace MemoryHierarchy
             splitContents = contents.Split(' ');
             arrayLength = splitContents.Length;
 
-            for(int i = 0; i < splitContents.Length; i++)
+            for (int i = 0; i < splitContents.Length; i++)
             {
-                if(splitContents[i] == "Data" && splitContents[i + 1] == "TLB")
+                if (splitContents[i] == "Data" && splitContents[i + 1] == "TLB")
                 {
                     SetTLB();
                 }
-                if(splitContents[i] == "Page" && splitContents[i + 1] == "Table")
+                if (splitContents[i] == "Page" && splitContents[i + 1] == "Table")
                 {
                     SetPageTable();
                 }
@@ -69,7 +69,7 @@ namespace MemoryHierarchy
                     arrayMarker = i;
                     SetDataCache();
                 }
-                if(splitContents[i] == "L2" && splitContents[i + 1] == "Cache")
+                if (splitContents[i] == "L2" && splitContents[i + 1] == "Cache")
                 {
                     arrayMarker = i;
                     SetL2();
@@ -116,7 +116,7 @@ namespace MemoryHierarchy
 
             indexBits = IndexAndOffset(numberOfSets);
             configOutput += ("\n" + $"Number of bits used for the index is {indexBits}");
-                
+
         }
 
         public void SetPageTable()
@@ -135,11 +135,11 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 2];
                     virtualPages = Int32.Parse(word);
-                    while(virtualPages % 2 != 0 && virtualPages > 8192)
+                    while (virtualPages % 2 != 0 && virtualPages > 8192)
                     {
                         Console.WriteLine("The number of virutal pages is either greater than 8192 or not a power of two. " +
                             "Please enter a new number of pages that is a power of two and less than or equal to 8192.");
-                        virtualPages = Convert.ToInt32(Console.ReadLine()); 
+                        virtualPages = Convert.ToInt32(Console.ReadLine());
                     }
                     configOutput += "\nNumber of virtial pages is " + virtualPages;
                 }
@@ -155,11 +155,11 @@ namespace MemoryHierarchy
                     }
                     configOutput += "\nNumber of physical pages is " + physicalPages;
                 }
-                if(splitContents[i] == "Page" && splitContents[i + 1] == "size:")
+                if (splitContents[i] == "Page" && splitContents[i + 1] == "size:")
                 {
                     word = splitContents[i + 2];
                     pageSize = Int32.Parse(word);
-                    while(pageSize % 2 != 0 && pageSize > 4096)
+                    while (pageSize % 2 != 0 && pageSize > 4096)
                     {
                         Console.WriteLine("The page size is either greater than 4096 or not a power of two. " +
                             "Please enter a new number of pages that is a power of two and less than or equal to 2048.");
@@ -183,7 +183,7 @@ namespace MemoryHierarchy
             int setSize = 0;
             int lineSize = 0;
             double indexBits = 0;
-            double offsetBits = 0;  
+            double offsetBits = 0;
             string writeAllocate = null;
             string word = null;
             string temp = null;
@@ -322,8 +322,5 @@ namespace MemoryHierarchy
            // temp = Math.Log2(temp);
             return temp;
         }
-
-
-
     }
 }
