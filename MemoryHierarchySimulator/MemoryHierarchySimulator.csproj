@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Cache.cs" />
     <Compile Include="OpenFile.cs" />
+    <Compile Include="OpenTraceFile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
