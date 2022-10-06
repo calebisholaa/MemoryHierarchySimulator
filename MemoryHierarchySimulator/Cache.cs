@@ -9,9 +9,6 @@ namespace MemoryHierarchySimulator
     internal class Cache
     {
 
-        public void CreateCaches(HashSet<string> L1)
-        {
-           int blockSizeL1 =
-        }
+       
     }
 }
