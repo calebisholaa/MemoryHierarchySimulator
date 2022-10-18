@@ -7,8 +7,30 @@ using System.Threading.Tasks;
 
 namespace MemoryHierarchy
 {
-    public class OpenFile
+    public class OpenConfigFile
     {
+        //Caleb added this
+        //I need the local variables to be accessed in other classes 
+       
+
+        public int NumberofSets { get; set; }
+        public int SetSize { get; set; }
+
+        public int LineSize { get; set; }
+
+        public double IndexBits { get; set; }
+
+        public double OffSetBits { get; set; }
+
+        public string  WriteAllocate { get; set; }
+
+        public string Word { get; set; }
+
+        public string Temp { get; set; }
+
+        //end of properties 
+
+
         public int arrayLength = 0;
         public int arrayMarker = 0;
         public string[] fileContents = null;
@@ -187,6 +209,9 @@ namespace MemoryHierarchy
             string writeAllocate = null;
             string word = null;
             string temp = null;
+
+           
+
             for (int i = arrayMarker; i < arrayLength; i++)
             {
                 if (splitContents[i] == "sets:")
@@ -198,6 +223,7 @@ namespace MemoryHierarchy
                         Console.WriteLine("The number of sets in your Data Cache is not a power of two. " +
                             "Please enter a new number of sets that is a power of two.");
                         numberOfSets = Convert.ToInt32(Console.ReadLine());
+
                     }
                     configOutput += "\nD-cache contains  " + numberOfSets + " sets.";
                 }
@@ -240,9 +266,19 @@ namespace MemoryHierarchy
             }
 
             indexBits = IndexAndOffset(numberOfSets);
+            
             configOutput += ("\n" + $"Number of bits used for the index is {indexBits}.");
             offsetBits = IndexAndOffset(lineSize);
             configOutput += ("\n" + $"Number of bits used for the offset is {offsetBits}.");
+
+            NumberofSets = numberOfSets;
+            SetSize = setSize;
+            LineSize = lineSize;
+            IndexBits = indexBits;
+            OffSetBits = offsetBits;
+            WriteAllocate = writeAllocate;
+            Word = word;
+            Temp = temp;
         }
 
         public void SetL2()
