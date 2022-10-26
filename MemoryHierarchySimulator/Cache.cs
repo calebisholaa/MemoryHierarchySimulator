@@ -54,6 +54,7 @@ namespace MemoryHierarchySimulator
 
             Console.WriteLine("Number of Set: " + sets.Count);
             Console.WriteLine("");
+            Console.WriteLine("Adress: " + addressSize);
             
 
         }
