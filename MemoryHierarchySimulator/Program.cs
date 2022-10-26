@@ -15,7 +15,7 @@ namespace MemoryHierarchySimulator
             Intro();
 
             OpenConfigFile openfile = new OpenConfigFile();
-            OpenTraceFile openTraceFile = new OpenTraceFile();
+          //  OpenTraceFile openTraceFile = new OpenTraceFile();
             Cache  cache = new Cache(openfile);
 
             openfile.ReadFile();
@@ -23,7 +23,7 @@ namespace MemoryHierarchySimulator
             Console.WriteLine();
             Console.WriteLine("Open Trace File...press Enter to select file.");
             Console.ReadKey();
-            openTraceFile.OpenTrace();
+           // openTraceFile.OpenTrace();
             Console.WriteLine();
             Console.WriteLine();
 
