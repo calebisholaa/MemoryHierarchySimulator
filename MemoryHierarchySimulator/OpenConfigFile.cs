@@ -202,7 +202,7 @@ namespace MemoryHierarchy
             configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
 
             PhysicalPages = physicalPages;
-            PageSize = physicalPages;
+            PageSize = pageSize;
         }
 
         public void SetDataCache()
