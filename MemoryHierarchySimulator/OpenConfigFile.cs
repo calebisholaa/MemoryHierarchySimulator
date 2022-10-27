@@ -28,6 +28,10 @@ namespace MemoryHierarchy
 
         public string Temp { get; set; }
 
+
+        public int PhysicalPages { get; set; }
+
+        public int PageSize { get; set; }  
         //end of properties 
 
 
@@ -196,6 +200,9 @@ namespace MemoryHierarchy
             configOutput += ("\n" + $"Number of bits used for the page table index is {indexBits}.");
             offsetBits = IndexAndOffset(pageSize);
             configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
+
+            PhysicalPages = physicalPages;
+            PageSize = pageSize;
         }
 
         public void SetDataCache()
@@ -204,8 +211,8 @@ namespace MemoryHierarchy
             int numberOfSets = 0;
             int setSize = 0;
             int lineSize = 0;
-            double indexBits = 0;
-            double offsetBits = 0;
+            double indexBits = 0.0;
+            double offsetBits = 0.0;
             string writeAllocate = null;
             string word = null;
             string temp = null;
