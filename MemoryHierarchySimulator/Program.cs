@@ -27,7 +27,7 @@ namespace MemoryHierarchySimulator
             Console.WriteLine();
             Console.WriteLine();
 
-            cache.CreateCaches();
+            cache.Caching();
             Console.ReadLine();
 
         }
