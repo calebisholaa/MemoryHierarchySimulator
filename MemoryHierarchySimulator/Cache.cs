@@ -47,6 +47,7 @@ namespace MemoryHierarchySimulator
         {
             Console.WriteLine("Creating Caches");
             var numberOfSet = openConfigFile.NumberofSets;
+            
             var setSize = openConfigFile.SetSize;   
             var lineSize = openConfigFile.LineSize;
             var addressSize = GetAddressSize(openConfigFile.PhysicalPages, openConfigFile.PageSize);        
@@ -109,6 +110,8 @@ namespace MemoryHierarchySimulator
         public void Print()
         {
             Console.WriteLine("Number of Set: " + sets.Count);
+            Console.WriteLine("Set Size: " + SetSize);
+
             Console.WriteLine("");
             Console.WriteLine("Address: " + AddressSize + "bits");
             Console.WriteLine();
@@ -140,6 +143,7 @@ namespace MemoryHierarchySimulator
                 {
                     Console.Write(item + " | ");
                 }
+                Console.WriteLine();
             }
 
             Console.WriteLine("\n----------------------------------------");
