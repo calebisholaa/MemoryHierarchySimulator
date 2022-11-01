@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MemoryHierarchy;
@@ -18,30 +21,73 @@ namespace MemoryHierarchySimulator
     public class Cache
     {
 
-        public  readonly OpenConfigFile openConfigFile;
+        public readonly OpenConfigFile openConfigFile;
+
+        private List<string> mockAddress = new List<string>();
+
+        private List<string> TagList { get; set; } 
+
+        private List<string> IndexList { get; set; }
+
+        private List<string> OffSetList { get; set; }
+
+        private List<List<int[]>> Set { get; set; }
+
+        private List<string>  IndexTable { get; set; }
+        private List<string>  TagTable { get; set; }
+        private List<string>  OffSetTable { get; set; }
+
+        private List<string> ResultTable { get; set; }
+
+
+
 
         private double AddressSize { get; set; }
         private double Index { get; set; }
         private double OffSet { get; set; }
-
         private double SetSize { get; set; }
+
+        
 
         List<List<int[]>> sets = new List<List<int[]>>();   
         List<Stack<string>> memoryAddress = new List<Stack<string>>();
 
 
+
+
+
         public Cache(OpenConfigFile openConfigFile)
         {
             this.openConfigFile = openConfigFile;
+            IndexList = new List<string>();
+            TagList = new List<string>();
+            OffSetList = new List<string>();
+
+            IndexTable = new List<string>();
+            OffSetTable = new List<string>();
+            TagTable = new List<string>();
+            ResultTable = new List<string>();
+
+            
         }       
 
         public void Caching()
         {
             CreateCaches();
             Print();
+            PrintBinaryAddress();
 
         }
 
+        public List<string> GenerateAddress()
+        {
+            List<string> addresses = new List<string>();
+            addresses.Add("c84");
+            addresses.Add("81c");
+            addresses.Add("14c");
+            addresses.Add("400");
+            return addresses;
+        }
 
         public void CreateCaches()
         {
@@ -54,15 +100,22 @@ namespace MemoryHierarchySimulator
             var offSet = openConfigFile.OffSetBits;
             var index = openConfigFile.IndexBits;
             var tag = addressSize - (offSet + index);
+            var address = GenerateAddress();
 
-            while (numberOfSet > 0)
-            {
-                sets.Add(CreateSets(CreateBlock(lineSize), setSize));
-                memoryAddress.Add(MemoryAddress(addressSize,offSet,index,tag));
-                
-                numberOfSet--;
-            }    
 
+           
+                while (numberOfSet > 0)
+                {
+                        for (int i = 0; i < address.Count; i++)
+                        {
+                            memoryAddress.Add(MemoryAddress(addressSize, offSet, index, tag, address[i]));
+                            sets.Add(CreateSets(CreateBlock(lineSize), setSize));
+                            numberOfSet--;
+                        }
+                }
+
+
+            Set = sets;
             AddressSize = addressSize;
             Index = index;
             OffSet = offSet;
@@ -70,6 +123,39 @@ namespace MemoryHierarchySimulator
             
 
         }
+        public void DataCache(List<string> index, List<string> offSet, List<string> tag, int numberOfSet)
+        {
+            List<string> indexTable = new List<string>();
+            List<string> offSetTable = new List<string>();
+            List<string> tagTable = new List<string>();
+            List<string> resultTable = new List<string>();
+
+
+            for (int i = 0; i < memoryAddress.Count; i++)
+            {
+                if(IndexList[i] == index[i] && TagList[i] == tag[i])
+                {
+                    indexTable.Add(index[i]);                  
+                    resultTable.Add("Hit");
+                    tagTable.Add(tag[i]);
+                    offSetTable.Add(offSet[i]);      
+                }
+                else if (IndexList[i] != index[i])
+                {
+                    resultTable.Add("Compulsory Miss");
+                    tagTable.Add(tag[i]);
+                    indexTable.Add(index[i]);
+                    offSetTable.Add(offSet[i]); 
+                }
+            }
+            ResultTable = resultTable;
+            IndexTable = indexTable;
+            OffSetTable = offSetTable;
+            TagTable = tagTable;            
+        }
+
+
+
         /// <summary>
         /// Set Up the memory Address for more visual understanding 
         /// </summary>
@@ -78,33 +164,175 @@ namespace MemoryHierarchySimulator
         /// <param name="index"></param>
         /// <param name="tag"></param>
         /// <returns>Stack<string></string></returns>
-        public Stack<string> MemoryAddress(double addressSize, double offSet, double index, double tag)
+        public Stack<string> MemoryAddress(double addressSize, double offSet, double index, double tag, string HexAddress)
         {
-            //    var addressSize = GetAddressSize(openConfigFile.PhysicalPages, openConfigFile.PageSize);
-            //    var offSet = openConfigFile.OffSetBits;
-            //    var index = openConfigFile.IndexBits;
-            //    var tag = addressSize - (offSet + index);
+
             Stack<string> stack = new Stack<string>((int)addressSize);
 
-            for (double k = 0; k < offSet; k++)
+            List<string> addresses = new List<string>();
+            List<char> listChar = new List<char>();
+            Stack<string> invertedTag = new Stack<string>();
+            Stack<string> invertedIndex = new Stack<string>();
+            Stack<string> invertedOffset = new Stack<string>();
+            var address = HexToBinary(HexAddress);
+            char[] charArray = address.ToCharArray();
+
+
+            int flag = 0;
+
+            var tempOffset = offSet;
+            var tempIndex = index;
+            var tempTag = tag;
+            var remain = charArray.Length - (offSet + index);
+            var solution = remain / tag;
+            var result = Math.Round(solution, 0, MidpointRounding.AwayFromZero);
+            var tempResult = result - 1;
+
+            var increment = result - solution;
+            increment = Math.Round(increment, 0, MidpointRounding.AwayFromZero);
+
+            var tempCharArryLength = charArray.Length;
+
+            for (int i = 0; i < charArray.Length; i++)
             {
-                stack.Push("O");
+                while (tempTag != 0)
+                {
+
+                    if (charArray.Length - (offSet + index) % tag == 0)
+                    {
+
+
+                        while (tempResult != 0)
+                        {
+                            listChar.Add(charArray[flag]);
+                            flag++;
+                            tempResult--;
+                        }
+                        char[] newArryChar = listChar.ToArray();
+                        string str = new string(newArryChar);
+                        addresses.Add(str);
+                        listChar.Clear();
+
+                        for (int j = 0; j < addresses.Count; j++)
+                        {
+                            stack.Push(addresses[j]);
+                            invertedTag.Push(addresses[j]);
+                        }
+                        addresses.Clear();
+
+                    }
+                    else if (charArray.Length - (offSet + index) % tag != 0)
+                    {
+
+                        tempResult = result;
+                        if (increment != 0)
+                        {
+                            stack.Push("xx");
+                            invertedTag.Push("xx");
+                            increment--;
+                            tempTag--;
+
+                        }
+                        while (tempResult != 0)
+                        {
+                            listChar.Add(charArray[flag]);
+                            flag++;
+                            tempResult--;
+                        }
+
+                        char[] newArryChar = listChar.ToArray();
+                        string str = new string(newArryChar);
+                        addresses.Add(str);
+                        listChar.Clear();
+
+                        for (int j = 0; j < addresses.Count; j++)
+                        {
+                            stack.Push(addresses[j]);
+                            invertedTag.Push(addresses[j]);
+                        }
+                        addresses.Clear();
+                    }
+                    tempTag--;
+                }
+                if (tempTag == 0)
+                {
+                    while (tempIndex != 0)
+                    {
+                        stack.Push(Char.ToString(charArray[flag]));
+                        invertedIndex.Push(Char.ToString(charArray[flag]));
+                        flag++;
+                        tempIndex--;
+                    }
+                }
+                if (tempIndex == 0)
+                {
+                    while (tempOffset != 0)
+                    {
+                        stack.Push(Char.ToString(charArray[flag]));
+                        invertedOffset.Push(Char.ToString(charArray[flag]));
+                     
+                        flag++;
+                        tempOffset--;
+                    }
+                }
+
+                var tagConvert = ConcatStack(ReverseStack(invertedTag));
+                var offSetConvert = ConcatStack(ReverseStack(invertedOffset));
+                var indexConvert = ConcatStack(ReverseStack(invertedIndex));
+                IndexList.Add(indexConvert);
+                OffSetList.Add(offSetConvert);
+                TagList.Add(tagConvert);
+
+                IndexList.RemoveAll(s => s == "");
+                OffSetList.RemoveAll(s => s == "");
+                TagList.RemoveAll(s => s == "");
+
+            }
+           
+            //IndexStack = ReverseStack(invertedIndex) ;
+            //OffSetStack = ReverseStack(invertedOffset);
+            //TagStack = ReverseStack(invertedTag);
+
+            Stack<string> reverseStack = ReverseStack(stack);
+
+            return reverseStack;
+
+        }
+
+        private string ConcatStack(Stack<string> stack)
+        {
+            //List<char> result = new List<char>(); 
+            List<string> temp = new List<string>(); 
+            while(stack.Count !=0)
+            {
+                temp.Add(stack.Pop());  
+              //  result.Add(char.Parse(stack.Pop()));
             }
 
-            for (double j = 0; j < index; j++)
-            {
+            //char[] newArryChar = result.ToArray();
+            //string str = new string(newArryChar);
+            StringBuilder builder = new StringBuilder();
 
-                stack.Push("I");
+            foreach (var item in temp)
+            {
+                builder.Append(item);
             }
 
-            for (double i = 0; i < tag; i++)
+           string str = builder.ToString();
+            
+            return str;
+        }
+      
+
+        private Stack<string> ReverseStack(Stack<string>  stack)
+        {
+            Stack<string> reverseStack = new Stack<string>();
+            while (stack.Count !=0)
             {
-                stack.Push("T");
+                reverseStack.Push(stack.Pop());
             }
 
-          
-            return stack;
-
+            return reverseStack;
         }
 
         public void Print()
@@ -120,6 +348,8 @@ namespace MemoryHierarchySimulator
             Console.WriteLine();
 
             int count = 1;
+             string[][] table = null;
+            string result = "";
 
             for (int i = 0; i < memoryAddress.Count; i++)
             {
@@ -127,6 +357,17 @@ namespace MemoryHierarchySimulator
                 PrintAddressStack(memoryAddress[i]);
                 count++;
             }
+
+            Console.WriteLine("Tag       " + "Index  " + "Offset  " + "Result");
+            for(int j=0; j< memoryAddress.Count; j++)
+            {
+                DataCache(IndexList, OffSetList, TagList, sets.Count);
+                Console.WriteLine(TagTable[j] + "  " + IndexTable[j] + "     " + OffSetTable[j] + "   " + ResultTable[j]);
+            }
+            Console.WriteLine();
+
+           
+
         }
 
         /// <summary>
@@ -147,6 +388,8 @@ namespace MemoryHierarchySimulator
             }
 
             Console.WriteLine("\n----------------------------------------");
+
+            
         }
 
 
@@ -187,6 +430,27 @@ namespace MemoryHierarchySimulator
             var result = Math.Log(address, 2);
 
             return result;
+        }
+
+        public string HexToBinary(string address)
+        {
+            string binarystring = String.Join(String.Empty,
+              address.Select(
+                c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0')
+              )
+            );
+
+            return binarystring;
+        }
+
+
+        public void PrintBinaryAddress()
+        {
+            Console.WriteLine("Binary Address");
+            foreach(var item in GenerateAddress())
+            {
+                Console.WriteLine(HexToBinary(item));
+            }
         }
        
     }
