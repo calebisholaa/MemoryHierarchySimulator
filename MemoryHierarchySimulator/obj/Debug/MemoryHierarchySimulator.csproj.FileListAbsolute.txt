@@ -6,3 +6,11 @@ C:\Users\caleb\source\repos\MemoryHierarchySimulator\MemoryHierarchySimulator\ob
 C:\Users\caleb\source\repos\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.csproj.CoreCompileInputs.cache
 C:\Users\caleb\source\repos\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.exe
 C:\Users\caleb\source\repos\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.pdb
+C:\Users\kylew\Desktop\MemoryHierarchySimulator-master\MemoryHierarchySimulator\bin\Debug\MemoryHierarchySimulator.exe.config
+C:\Users\kylew\Desktop\MemoryHierarchySimulator-master\MemoryHierarchySimulator\bin\Debug\MemoryHierarchySimulator.exe
+C:\Users\kylew\Desktop\MemoryHierarchySimulator-master\MemoryHierarchySimulator\bin\Debug\MemoryHierarchySimulator.pdb
+C:\Users\kylew\Desktop\MemoryHierarchySimulator-master\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.csproj.AssemblyReference.cache
+C:\Users\kylew\Desktop\MemoryHierarchySimulator-master\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.csproj.SuggestedBindingRedirects.cache
+C:\Users\kylew\Desktop\MemoryHierarchySimulator-master\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.csproj.CoreCompileInputs.cache
+C:\Users\kylew\Desktop\MemoryHierarchySimulator-master\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.exe
+C:\Users\kylew\Desktop\MemoryHierarchySimulator-master\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.pdb

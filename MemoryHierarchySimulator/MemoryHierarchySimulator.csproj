@@ -45,8 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache.cs" />
+    <Compile Include="HierarchyTraverse.cs" />
     <Compile Include="OpenConfigFile.cs" />
     <Compile Include="OpenTraceFile.cs" />
+    <Compile Include="Page.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

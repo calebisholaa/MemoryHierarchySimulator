@@ -43,9 +43,9 @@ namespace MemoryHierarchySimulator
             var lineSize = openConfigFile.LineSize;
             var offSet = openConfigFile.OffSetBits;
             var addressSize = GetAddressSize(openConfigFile.PhysicalPages, openConfigFile.PageSize);
-           
-            
-            while(numberOfSet > 0)
+
+
+            while (numberOfSet > 0)
             {
                 sets.Add(CreateSets(CreateBlock(lineSize), setSize));
                 

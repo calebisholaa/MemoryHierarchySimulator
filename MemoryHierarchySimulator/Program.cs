@@ -15,21 +15,22 @@ namespace MemoryHierarchySimulator
             Intro();
 
             OpenConfigFile openfile = new OpenConfigFile();
-          //  OpenTraceFile openTraceFile = new OpenTraceFile();
-            Cache  cache = new Cache(openfile);
+            OpenTraceFile openTraceFile = new OpenTraceFile();
+            Cache cache = new Cache(openfile);
+            HierarchyTraverse hierarchyTraverse = new HierarchyTraverse();
 
             openfile.ReadFile();
 
             Console.WriteLine();
             Console.WriteLine("Open Trace File...press Enter to select file.");
             Console.ReadKey();
-           // openTraceFile.OpenTrace();
+            openTraceFile.OpenTrace();
             Console.WriteLine();
             Console.WriteLine();
 
             cache.CreateCaches();
+            hierarchyTraverse.printTable(openTraceFile, openfile);
             Console.ReadLine();
-
         }
 
 

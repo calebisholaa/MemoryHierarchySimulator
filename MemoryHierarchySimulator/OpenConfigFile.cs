@@ -20,7 +20,11 @@ namespace MemoryHierarchy
 
         public double IndexBits { get; set; }
 
+        public double IndexBitsPage { get; set; }
+
         public double OffSetBits { get; set; }
+
+        public double OffSetBitsPage { get; set; }
 
         public string  WriteAllocate { get; set; }
 
@@ -30,6 +34,8 @@ namespace MemoryHierarchy
 
 
         public int PhysicalPages { get; set; }
+
+        public int VirtualPages { get; set; }
 
         public int PageSize { get; set; }  
         //end of properties 
@@ -54,7 +60,8 @@ namespace MemoryHierarchy
             while (keepGoing)
             {
                 Console.WriteLine("\nPlease enter the file path for the config file.");
-                filePath = Console.ReadLine();
+                //filePath = Console.ReadLine();
+                filePath = "C:\\Users\\kylew\\Desktop\\MemoryHierarchySimulator-master\\trace.config";
 
                 try
                 {
@@ -73,7 +80,7 @@ namespace MemoryHierarchy
             fileContents = File.ReadAllText(filePath).Split('\n');
             foreach (string line in fileContents)
             {
-                contents += line;
+                contents += line+ " ";
             }
 
             contents = contents.Replace($"\r", " ");
@@ -201,8 +208,11 @@ namespace MemoryHierarchy
             offsetBits = IndexAndOffset(pageSize);
             configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
 
+            VirtualPages = virtualPages;
             PhysicalPages = physicalPages;
             PageSize = pageSize;
+            OffSetBitsPage = offsetBits;
+            IndexBitsPage = indexBits;
         }
 
         public void SetDataCache()
