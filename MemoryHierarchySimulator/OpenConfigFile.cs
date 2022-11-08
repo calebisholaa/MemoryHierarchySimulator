@@ -60,8 +60,7 @@ namespace MemoryHierarchy
             while (keepGoing)
             {
                 Console.WriteLine("\nPlease enter the file path for the config file.");
-                //filePath = Console.ReadLine();
-                filePath = "C:\\Users\\kylew\\Desktop\\MemoryHierarchySimulator-master\\trace.config";
+                filePath = Console.ReadLine();
 
                 try
                 {
