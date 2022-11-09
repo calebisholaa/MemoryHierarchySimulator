@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,9 @@ namespace MemoryHierarchy
         public string[] almostSplitContents = null;
         public string[] individualWords = null;
         public string configOutput = null;
+        public int pageSizeTLB = 0;
+        public int numberOfPagesTLB = 0;
+        public double pageOffsetTLB = 0;
 
         public void ReadFile()
         {
@@ -73,6 +76,22 @@ namespace MemoryHierarchy
                     arrayMarker = i;
                     SetL2();
                 }
+                if (splitContents[i] == "Virtual" && splitContents[i + 1] == "addresses:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+                if (splitContents[i] == "TLB:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+                if (splitContents[i] == "L2" && splitContents[i + 1] == "cache:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+
             }
 
             Console.WriteLine(configOutput);
@@ -92,7 +111,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 1];
                     numberOfSets = Int32.Parse(word);
-                    while (numberOfSets % 2 != 0)
+                    while (isPowerOf2(numberOfSets) == false)
                     {
                         Console.WriteLine("Your set is not a power of two. Please enter a new number that is a power of two.");
                         numberOfSets = Convert.ToInt32(Console.ReadLine());
@@ -103,7 +122,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 1];
                     setSize = Int32.Parse(word);
-                    while (setSize % 2 != 0 && setSize > 64)
+                    while (isPowerOf2(setSize) == false || setSize > 64)
                     {
                         Console.WriteLine("The number of enteries is either greater than 64 or not a power of two. Please enter a new number that is a power of two and less than or equal to 64.");
                         setSize = Convert.ToInt32(Console.ReadLine());
@@ -134,7 +153,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 2];
                     virtualPages = Int32.Parse(word);
-                    while(virtualPages % 2 != 0 && virtualPages > 8192)
+                    while(isPowerOf2(virtualPages) == false || virtualPages > 8192)
                     {
                         Console.WriteLine("The number of virutal pages is either greater than 8192 or not a power of two. " +
                             "Please enter a new number of pages that is a power of two and less than or equal to 8192.");
@@ -146,7 +165,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 2];
                     physicalPages = Int32.Parse(word);
-                    while (physicalPages % 2 != 0 && physicalPages > 2048)
+                    while (isPowerOf2(physicalPages) == false || physicalPages > 2048)
                     {
                         Console.WriteLine("The number of pyhsical pages is either greater than 2048 or not a power of two. " +
                             "Please enter a new number of pages that is a power of two and less than or equal to 2048.");
@@ -158,20 +177,22 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 2];
                     pageSize = Int32.Parse(word);
-                    while(pageSize % 2 != 0 && pageSize > 4096)
+                    while(isPowerOf2(pageSize) == false || pageSize > 4096)
                     {
                         Console.WriteLine("The page size is either greater than 4096 or not a power of two. " +
                             "Please enter a new number of pages that is a power of two and less than or equal to 2048.");
                         pageSize = Convert.ToInt32(Console.ReadLine());
                     }
+                    pageSizeTLB = pageSize;
                     configOutput += "\nPage size: " + pageSize;
                     i = arrayLength + 1;
-                }
+                } 
             }
 
             indexBits = IndexAndOffset(virtualPages);
             configOutput += ("\n" + $"Number of bits used for the page table index is {indexBits}.");
             offsetBits = IndexAndOffset(pageSize);
+            pageOffsetTLB = offsetBits;
             configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
         }
 
@@ -192,7 +213,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 1];
                     numberOfSets = Int32.Parse(word);
-                    while (numberOfSets % 2 != 0)
+                    while (isPowerOf2(numberOfSets) == false)
                     {
                         Console.WriteLine("The number of sets in your Data Cache is not a power of two. " +
                             "Please enter a new number of sets that is a power of two.");
@@ -204,7 +225,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 2];
                     setSize = Int32.Parse(word);
-                    while (setSize % 2 != 0 && setSize > 128)
+                    while (isPowerOf2(setSize) == false || setSize > 128)
                     {
                         Console.WriteLine("The number entries for the Data Cache is either greater than 128 or not a power of two. " +
                             "Please enter a new number of entries that is a power of two and less than or equal to 128.");
@@ -216,7 +237,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 2];
                     lineSize = Int32.Parse(word);
-                    while (lineSize % 2 != 0 && lineSize < 8)
+                    while (isPowerOf2(lineSize) == false || lineSize < 8)
                     {
                         Console.WriteLine("The line size for the Data Cache is either less than 8 or not a power of two. " +
                             "Please enter a new  that is a power of two and greater than or equal to 8.");
@@ -261,7 +282,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 1];
                     numberOfSets = Int32.Parse(word);
-                    while (numberOfSets % 2 != 0)
+                    while (isPowerOf2(numberOfSets) == false)
                     {
                         Console.WriteLine("The number of sets in your L2 Cache is not a power of two. " +
                             "Please enter a new number of sets that is a power of two.");
@@ -273,7 +294,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 2];
                     setSize = Int32.Parse(word);
-                    while (setSize % 2 != 0 && setSize > 128)
+                    while (isPowerOf2(setSize) == false || setSize > 128)
                     {
                         Console.WriteLine("The number entries for the L2 is either greater than 128 or not a power of two. " +
                             "Please enter a new number of entries that is a power of two and less than or equal to 128.");
@@ -285,7 +306,7 @@ namespace MemoryHierarchy
                 {
                     word = splitContents[i + 2];
                     lineSize = Int32.Parse(word);
-                    while (lineSize % 2 != 0 && lineSize < 8)
+                    while (isPowerOf2(lineSize) == false || lineSize < 8)
                     {
                         Console.WriteLine("The line size for the L2 not a power of two. " +
                             "Please enter a new that is a power of two.");
@@ -313,12 +334,59 @@ namespace MemoryHierarchy
             configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
         }
 
+        public void SetMisc()
+        {
+            for (int i = arrayMarker; i < arrayLength; i++)
+            {
+                string vAddress = " ";
+                string TLB = " ";
+                string L2Cache = " ";
+                if (splitContents[i] == "addresses:")
+                {
+                    vAddress = splitContents[i + 1];
+                    vAddress = vAddress.ToLower();
+                    while(vAddress != "y" && vAddress != "n" )
+                    {
+                        Console.WriteLine("Would you like to use virtual addresses? Please input y or n.");
+                        vAddress = Console.ReadLine();
+                    }
+
+                    configOutput += "\n\nThe addresses read in are virtual addresses.";
+                }
+                if (splitContents[i] == "TLB:")
+                {
+                    TLB = splitContents[i + 1];
+                    TLB = TLB.ToLower();
+                    while (TLB != "y" && TLB != "n")
+                    {
+                        Console.WriteLine("Would you like to use the TLB? Please input y or n.");
+                        TLB = Console.ReadLine();
+                    }
+                }
+                if (splitContents[i] == "L2" && splitContents[i + 1] == "cache:")
+                {
+                    L2Cache = splitContents[i + 2];
+                    L2Cache = L2Cache.ToLower();
+                    while (L2Cache != "y" && L2Cache != "n")
+                    {
+                        Console.WriteLine("Would you like to use the L2 cache? Please input y or n.");
+                        L2Cache = Console.ReadLine();
+                    }
+                }
+            }
+        }
+
         public double IndexAndOffset(int i)
         {
             double temp = 0;
             temp = i;
             temp = Math.Log2(temp);
             return temp;
+        }
+
+        public bool isPowerOf2(int i)
+        {
+            return (int)(Math.Ceiling((Math.Log(i) / Math.Log(2)))) == (int)(Math.Floor(((Math.Log(i) / Math.Log(2)))));
         }
     }
 }
