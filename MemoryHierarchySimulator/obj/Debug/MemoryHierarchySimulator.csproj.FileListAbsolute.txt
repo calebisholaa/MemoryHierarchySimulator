@@ -6,3 +6,10 @@ C:\Users\caleb\source\repos\MemoryHierarchySimulator\MemoryHierarchySimulator\ob
 C:\Users\caleb\source\repos\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.csproj.CoreCompileInputs.cache
 C:\Users\caleb\source\repos\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.exe
 C:\Users\caleb\source\repos\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.pdb
+D:\Users\Owner\Documents\GitHub\MemoryHierarchySimulator\MemoryHierarchySimulator\bin\Debug\MemoryHierarchySimulator.exe.config
+D:\Users\Owner\Documents\GitHub\MemoryHierarchySimulator\MemoryHierarchySimulator\bin\Debug\MemoryHierarchySimulator.exe
+D:\Users\Owner\Documents\GitHub\MemoryHierarchySimulator\MemoryHierarchySimulator\bin\Debug\MemoryHierarchySimulator.pdb
+D:\Users\Owner\Documents\GitHub\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.csproj.AssemblyReference.cache
+D:\Users\Owner\Documents\GitHub\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.csproj.CoreCompileInputs.cache
+D:\Users\Owner\Documents\GitHub\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.exe
+D:\Users\Owner\Documents\GitHub\MemoryHierarchySimulator\MemoryHierarchySimulator\obj\Debug\MemoryHierarchySimulator.pdb
