@@ -44,24 +44,79 @@ namespace MemoryHierarchySimulator
         private int pageTableRefs = 0;
         private int diskRefs = 0;
 
+        /// <summary>
+        /// Simulates the Memory Hierarchy Transversal
+        /// </summary>
         public void MemoryHierarchySimulator()
         {
             PrintVirtualAddressesTable();
             List<string> hexAddress = new List<string>(new string[] { "c84", "81c", "14c", "c84", "400", "148", "144", "c80", "008" });
             foreach (string addr in hexAddress)
             {
+                tLBTag = "";
+                tLBInd = "";
+                tLBResult = "";
+                pTResult = "";
+                physicalPageNumber = "";
+                dataCashTag = "";
+                dataCashInd = "";
+                dataCashResult = "";
+                l2Tag = "";
+                l2Ind = "";
+                l2Result = "";
+
                 virtAddress = addr.PadLeft(8, '0');
                 virtPageNumber = GetPageNum(virtAddress, 8, 4); //(virtAddress, openfile.OffSetBitsPage, openfile.IndexBitsPage)
                 pageOffset = GetPageOff(virtAddress, 8, 4); //(virtAddress, openfile.OffSetBitsPage, openfile.IndexBitsPage)
                 CheckTLB();
                 if (tLBResult.Equals("hit"))
                 {
+                   
                     //get result 
+                    //Check L1 cache
+                    if (dataCashResult.Equals("hit"))
+                    {
+                        
+                    }
+                    else
+                    {
+                        
+                        //Check L2 Cache
+                        if (l2Result.Equals("hit"))
+                        {
+                            
+                        }
+                        else
+                        {
+                            
+                        }
+                    }
+
+
                 }
                 else
                 {
-                    //page table walk 
+                    dtlbMisses++;
+                    pageTableRefs++;
+                    //page table walk
+                    if (pTResult.Equals("hit"))
+                    {
+                        //Check l2 cache
+                        if (l2Result.Equals("hit"))
+                        {
+                           
+                        }
+                        else
+                        {
+                            
+                        }
+                    }
+                    else
+                    {
+                        
+                    }
                 }
+
                 PrintVirtualAddressesLine();
 
             }
@@ -90,6 +145,10 @@ namespace MemoryHierarchySimulator
                 physicalPageNumber, dataCashTag, dataCashInd, dataCashResult, l2Tag, l2Ind, l2Result);
         }
 
+        /// <summary>
+        /// Checks the TLB and gets the physical address if
+        /// it exists in the TLB
+        /// </summary>
         private void CheckTLB()
         {
             //ToDo check the tlb table
