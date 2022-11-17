@@ -32,6 +32,8 @@ namespace MemoryHierarchy
         public int PhysicalPages { get; set; }
 
         public int PageSize { get; set; }  
+
+        public int VirtualPages { get; set; }
         //end of properties 
 
 
@@ -203,6 +205,7 @@ namespace MemoryHierarchy
 
             PhysicalPages = physicalPages;
             PageSize = pageSize;
+            VirtualPages = virtualPages;
         }
 
         public void SetDataCache()
