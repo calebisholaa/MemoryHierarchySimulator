@@ -48,6 +48,7 @@
     <Compile Include="HierarchyTransversal.cs" />
     <Compile Include="OpenConfigFile.cs" />
     <Compile Include="OpenTraceFile.cs" />
+    <Compile Include="PageTable.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

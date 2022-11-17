@@ -15,7 +15,7 @@ namespace MemoryHierarchySimulator
             Intro();
 
             OpenConfigFile openfile = new OpenConfigFile();
-          //  OpenTraceFile openTraceFile = new OpenTraceFile();
+            //  OpenTraceFile openTraceFile = new OpenTraceFile();
             Cache  cache = new Cache(openfile);
 
             openfile.ReadFile();
@@ -29,7 +29,8 @@ namespace MemoryHierarchySimulator
 
             cache.CreateCaches();
             Console.ReadLine();
-
+            PageTable pages = new PageTable(openfile.VirtualPages, openfile.PhysicalPages, openfile.PageSize);
+            HierarchyTransversal hierarchyTransversal = new HierarchyTransversal();
         }
 
 
