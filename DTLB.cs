@@ -8,11 +8,13 @@ namespace MemH
 {
     public class DTLB
     {
-        string[,] TLB = new string[64,1];
-        int TLBSize = 0;
+        string[,] evenTLB = new string[64,1];
+        string[,] oddTLB = new string[64,1];
+        int evenTLBSize = 0;
+        int oddTLBSize = 0;
 
         /// <summary>
-        /// Searches the DTLB for a tag. If the DTLB has the tag then it will return the Physical Page Number (PPN).
+        /// Searches the DTLB for a tag. If the DTLB has the tag then it will return the Physical Page Number (PPN). 
         /// If the DTLB does not have the tag then it will copy the tag within the DTLB.
         /// </summary>
         /// <param name="tag"></param>
@@ -21,30 +23,60 @@ namespace MemH
         {
             bool hit = false;
             string PPN = " ";
-            for(int i = 0; i < TLB.GetLength(0); i++)
-            {
-                if (TLB[i,0] == tag)
-                {
-                    hit = true;
-                    PPN = TLB[i,1];
-                    return PPN;
-                }
-            }
 
-            if(TLBSize > 64)
+
+            if(OddOrEven(tag))
             {
-                TLBSize = 0;
-                TLB[TLBSize, 0] = tag;
-                TLB[TLBSize,1] = " ";
-                TLBSize++;
+                for (int i = 0; i < evenTLB.GetLength(0); i++)
+                {
+                    if (evenTLB[i, 0] == tag)
+                    {
+                        hit = true;
+                        PPN = evenTLB[i, 1];
+                        return PPN;
+                    }
+                }
+
+                if (evenTLBSize > 64)
+                {
+                    evenTLBSize = 0;
+                    evenTLB[evenTLBSize, 0] = tag;
+                    evenTLB[evenTLBSize, 1] = " ";
+                    evenTLBSize++;
+                }
+                else
+                {
+                    evenTLB[evenTLBSize, 0] = tag;
+                    evenTLBSize++;
+                }
             }
             else
             {
-                TLB[TLBSize, 0] = tag;
-                TLBSize++;
+                for (int i = 0; i < oddTLB.GetLength(0); i++)
+                {
+                    if (oddTLB[i, 0] == tag)
+                    {
+                        hit = true;
+                        PPN = oddTLB[i, 1];
+                        return PPN;
+                    }
+                }
+
+                if (oddTLBSize > 64)
+                {
+                    oddTLBSize = 0;
+                    oddTLB[oddTLBSize, 0] = tag;
+                    oddTLB[oddTLBSize, 1] = " ";
+                    oddTLBSize++;
+                }
+                else
+                {
+                    oddTLB[oddTLBSize, 0] = tag;
+                    oddTLBSize++;
+                }
             }
 
-            PPN = "false";
+            PPN = "false"; 
             return PPN;
         }
 
@@ -55,13 +87,90 @@ namespace MemH
         /// <param name="PPN"></param>
         public void SetPPN(string tag, string PPN)
         {
-            for(int i = 0; i < TLB.GetLength(0); i++)
+            if(OddOrEven(tag))
             {
-                if (TLB[i,0] == tag)
+                for (int i = 0; i < evenTLB.GetLength(0); i++)
                 {
-                    TLB[i,1] = PPN;
+                    if (evenTLB[i, 0] == tag)
+                    {
+                        evenTLB[i, 1] = PPN;
+                    }
                 }
             }
+            else
+            {
+                for (int i = 0; i < oddTLB.GetLength(0); i++)
+                {
+                    if (oddTLB[i, 0] == tag)
+                    {
+                        oddTLB[i, 1] = PPN;
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Determines if the tag is odd or even
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public bool OddOrEven(string s)
+        {
+            bool even = false;
+            switch (s)
+            {
+                case "1":
+                    even = false;
+                    break;
+                case "2":
+                    even = true;
+                    break;
+                case "3":
+                    even = false;
+                    break;
+                case "4":
+                    even = true;
+                    break;
+                case "5":
+                    even = false;
+                    break;
+                case "6":
+                    even = true;
+                    break;
+                case "7":
+                    even = false;
+                    break;
+                case "8":
+                    even = true;
+                    break;
+                case "9":
+                    even = false;
+                    break;
+                case "a":
+                    even = true;
+                    break;
+                case "b":
+                    even = false;
+                    break;
+                case "c":
+                    even = true;
+                    break;
+                case "d":
+                    even = false;
+                    break;
+                case "e":
+                    even = true;
+                    break;
+                case "f":
+                    even = false;
+                    break;
+                default:
+                    break;
+            }
+
+            return even;
+
         }
 
     }
