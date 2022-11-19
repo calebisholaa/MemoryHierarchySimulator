@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Services;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
@@ -23,13 +25,19 @@ namespace MemoryHierarchySimulator
 
         public readonly OpenConfigFile openConfigFile;
 
+        public readonly OpenTraceFile openTraceFile; 
         private List<string> mockAddress = new List<string>();
 
-        private List<string> TagList { get; set; } 
+        List<string> CacheList = new List<string>();
 
+        private List<string> TagList { get; set; }
+
+        private List<string> CacheTagList { get; set; }
         private List<string> IndexList { get; set; }
+        private List<string> CacheIndexList { get; set; }
 
         private List<string> OffSetList { get; set; }
+        private List<string> CaccheOffSetList { get; set; }
 
         private List<List<int[]>> Set { get; set; }
 
@@ -51,6 +59,7 @@ namespace MemoryHierarchySimulator
 
         List<List<int[]>> sets = new List<List<int[]>>();   
         List<Stack<string>> memoryAddress = new List<Stack<string>>();
+        List<Stack<string>> CacheStackList = new List<Stack<string>>();    
 
 
 
@@ -71,13 +80,79 @@ namespace MemoryHierarchySimulator
             
         }       
 
-        public void Caching()
+       
+
+        public string CreateCache(string hexAddress)
         {
-            CreateCaches();
-            Print();
-            PrintBinaryAddress();
+            var result = "";
+            Console.WriteLine("Creating Caches");
+            var numberOfSet = openConfigFile.NumberofSets;
+            var setSize = openConfigFile.SetSize;
+            var lineSize = openConfigFile.LineSize;
+            var addressSize = GetAddressSize(openConfigFile.PhysicalPages, openConfigFile.PageSize);
+            var offSet = openConfigFile.OffSetBits;
+            var index = openConfigFile.IndexBits;
+            var tag = addressSize - (offSet + index);
+            var hexAddressCopy = hexAddress;
+
+
+            AddressSize = addressSize;
+            Index = index;
+            OffSet = offSet;
+            SetSize = setSize;
+
+            CacheStackList.Add(MemoryAddress(addressSize, offSet, index, tag, hexAddress));
+
+
+
+            if(IndexList.Count==1)
+            {
+                result = "Miss";
+            }
+            
+            if(IndexList.Count>1)
+            {
+                for (int i = 0; i < IndexList.Count; i++)
+                {
+                   
+                    for (int j = 1; j < IndexList.Count+1; j++)
+                    {
+                       if(TagList[i] == TagList[j])
+                       {
+                          result = "Hit";
+                          break ;
+                       }
+                       else
+                       {
+                          result = "Miss";
+                          break;
+                        }
+                     }   
+                    break;
+                }
+            }
+
+
+           return result;   
 
         }
+
+
+        /// <summary>
+        /// Ignore Below
+        /// </summary>
+        /// <returns></returns>
+
+        //public string getPhysicalAddress(string address)
+        //{
+        //    string bitAddress = "00" + Convert.ToString(Convert.ToInt64(address, 16), 2);//convert the address to individual bits, aditional 0's to make bits to 14 bit length needed
+        //    string locAddress = bitAddress.Remove((int)OffSet);//remove all but the bits that identify where in the page table the physical address is.
+        //    Console.WriteLine(Convert.ToString(Convert.ToInt64(bitAddress, 2), 16));
+        //    int index = Convert.ToInt32(locAddress, 2);
+        //   // string phyAddress = addressTable[index]; // get from trace file 
+        //    string offAddress = bitAddress.Substring(0, (int)OffSet);//zero out parts of the string that represent the virtual address
+        //    return Convert.ToString(Convert.ToInt64((phyAddress + offAddress), 2), 16);//combines the phyical address and the offset into one hexedecimal address
+        //}
 
         public List<string> GenerateAddress()
         {
@@ -85,13 +160,22 @@ namespace MemoryHierarchySimulator
             addresses.Add("c84");
             addresses.Add("81c");
             addresses.Add("14c");
+            addresses.Add("c84");
             addresses.Add("400");
+            addresses.Add("148");
+            addresses.Add("144");
+            addresses.Add("c80");
+            addresses.Add("c80");
+            addresses.Add("008");
+            addresses.Add(" ");
+
+
             return addresses;
         }
 
         public void CreateCaches()
         {
-            Console.WriteLine("Creating Caches");
+            //Console.WriteLine("Creating Caches");
             var numberOfSet = openConfigFile.NumberofSets;
             
             var setSize = openConfigFile.SetSize;   
@@ -142,7 +226,7 @@ namespace MemoryHierarchySimulator
                 }
                 else if (IndexList[i] != index[i])
                 {
-                    resultTable.Add("Compulsory Miss");
+                    resultTable.Add("Miss");
                     tagTable.Add(tag[i]);
                     indexTable.Add(index[i]);
                     offSetTable.Add(offSet[i]); 
