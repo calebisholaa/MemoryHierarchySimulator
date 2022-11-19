@@ -45,11 +45,15 @@ namespace MemoryHierarchySimulator
         private int pageTableRefs = 0;
         private int diskRefs = 0;
 
+        private DTLB dTLB;
+
         /// <summary>
         /// Simulates the Memory Hierarchy Transversal
         /// </summary>
-        public HierarchyTransversal()
+        public HierarchyTransversal(DTLB dTLB)
         {
+            this.dTLB = dTLB;
+
             PrintVirtualAddressesTable();
             List<string> hexAddress = new List<string>(new string[] { "c84", "81c", "14c", "c84", "400", "148", "144", "c80", "008" });
             foreach (string addr in hexAddress)
@@ -132,13 +136,21 @@ namespace MemoryHierarchySimulator
         /// </summary>
         private void CheckTLB()
         {
-            //ToDo check the tlb table
-            //if(check)
-            tLBResult = "hit";
-            dTLBHits++;
-            //else
-            tLBResult = "miss";
-            dTLBMisses++;
+            string tLBSearchResults = dTLB.SearchTLB(virtPageNumber);
+
+            if (tLBSearchResults.Equals("empty") != true)
+            {
+                physicalPageNumber = tLBSearchResults;
+                tLBResult = "hit";
+                dTLBHits++;
+            }
+            else
+            {
+                tLBResult = "miss";
+                dTLBMisses++;
+            }
+            
+            
         }
 
         /// <summary>

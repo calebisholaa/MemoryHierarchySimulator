@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache.cs" />
+    <Compile Include="DTLB.cs" />
+    <Compile Include="DTLBEntry.cs" />
     <Compile Include="HierarchyTransversal.cs" />
     <Compile Include="OpenConfigFile.cs" />
     <Compile Include="OpenTraceFile.cs" />

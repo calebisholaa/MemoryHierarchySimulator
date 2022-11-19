@@ -15,22 +15,21 @@ namespace MemoryHierarchySimulator
             Intro();
 
             OpenConfigFile openfile = new OpenConfigFile();
-            //  OpenTraceFile openTraceFile = new OpenTraceFile();
+            //OpenTraceFile openTraceFile = new OpenTraceFile();
             Cache  cache = new Cache(openfile);
-
+            //DTLB dTLB = new DTLB(2, 1);
             openfile.ReadFile();
 
             Console.WriteLine();
-            Console.WriteLine("Open Trace File...press Enter to select file.");
-            Console.ReadKey();
-           // openTraceFile.OpenTrace();
+            //Console.WriteLine("Open Trace File...press Enter to select file.");
+            //Console.ReadKey();
+            //openTraceFile.OpenTrace();
             Console.WriteLine();
             Console.WriteLine();
-
+            Console.WriteLine("What");
             cache.CreateCaches();
-            Console.ReadLine();
             PageTable pages = new PageTable(openfile.VirtualPages, openfile.PhysicalPages, openfile.PageSize);
-            HierarchyTransversal hierarchyTransversal = new HierarchyTransversal();
+            //HierarchyTransversal hierarchyTransversal = new HierarchyTransversal(dTLB);
         }
 
 
