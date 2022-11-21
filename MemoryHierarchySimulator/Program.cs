@@ -1,5 +1,4 @@
-﻿using MemoryHierarchy;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,27 +8,26 @@ namespace MemoryHierarchySimulator
 {
     public class Program
     {
-        [STAThread]
         static void Main(string[] args)
         {
             Intro();
-
             OpenConfigFile openfile = new OpenConfigFile();
             //OpenTraceFile openTraceFile = new OpenTraceFile();
-            Cache  cache = new Cache(openfile);
-            //DTLB dTLB = new DTLB(2, 1);
+            
             openfile.ReadFile();
 
             Console.WriteLine();
-            //Console.WriteLine("Open Trace File...press Enter to select file.");
-            //Console.ReadKey();
+            Console.WriteLine("Open Trace File...press Enter to select file.");
+            Console.ReadKey();
             //openTraceFile.OpenTrace();
             Console.WriteLine();
             Console.WriteLine();
-            Console.WriteLine("What");
-            cache.CreateCaches();
+
+            //cache.CreateCaches();
             PageTable pages = new PageTable(openfile.VirtualPages, openfile.PhysicalPages, openfile.PageSize);
-            //HierarchyTransversal hierarchyTransversal = new HierarchyTransversal(dTLB);
+            List<string> hexAddress = new List<string>(new string[] { "c84", "81c", "14c", "c84", "400", "148", "144", "c80", "008" });
+            
+            HierarchyTransversal hierarchyTransversal = new HierarchyTransversal(openfile, hexAddress);
         }
 
 

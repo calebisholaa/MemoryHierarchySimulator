@@ -5,24 +5,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MemoryHierarchy
+namespace MemoryHierarchySimulator
 {
     public class OpenConfigFile
     {
         //Caleb added this
         //I need the local variables to be accessed in other classes 
-       
+
 
         public int NumberofSets { get; set; }
         public int SetSize { get; set; }
 
         public int LineSize { get; set; }
 
-        public double IndexBits { get; set; }
+        public int IndexBits { get; set; }
 
-        public double OffSetBits { get; set; }
+        public int OffSetBits { get; set; }
 
-        public string  WriteAllocate { get; set; }
+        public int DCIndexBits { get; set; }
+
+        public int DCOffSetBits { get; set; }
+
+        public int DCNumOfSets { get; set; }
+
+        public int DCNumOfEntries { get; set; }
+
+        public int L2IndexBits { get; set; }
+
+        public int L2OffsetBits { get; set; }
+
+        public int L2NumOfSets { get; set; }
+
+        public int L2NumOfEntries { get; set; }
+
+        public string WriteAllocate { get; set; }
 
         public string Word { get; set; }
 
@@ -31,9 +47,14 @@ namespace MemoryHierarchy
 
         public int PhysicalPages { get; set; }
 
-        public int PageSize { get; set; }  
+        public int PageSize { get; set; }
 
         public int VirtualPages { get; set; }
+
+        public int DTLBSets { get; set; }
+
+        public int DTLBEntries { get; set; }
+
         //end of properties 
 
 
@@ -44,6 +65,11 @@ namespace MemoryHierarchy
         public string[] almostSplitContents = null;
         public string[] individualWords = null;
         public string configOutput = null;
+
+        public OpenConfigFile()
+        {
+            
+        }
 
         public void ReadFile()
         {
@@ -145,7 +171,10 @@ namespace MemoryHierarchy
             indexBits = IndexAndOffset(numberOfSets);
             configOutput += ("\n" + $"Number of bits used for the index is {indexBits}");
 
+            DTLBSets = numberOfSets;
+            DTLBEntries = setSize;
         }
+     
 
         public void SetPageTable()
         {
@@ -214,13 +243,13 @@ namespace MemoryHierarchy
             int numberOfSets = 0;
             int setSize = 0;
             int lineSize = 0;
-            double indexBits = 0.0;
-            double offsetBits = 0.0;
+            int indexBits = 0;
+            int offsetBits = 0;
             string writeAllocate = null;
             string word = null;
             string temp = null;
 
-           
+
 
             for (int i = arrayMarker; i < arrayLength; i++)
             {
@@ -275,11 +304,14 @@ namespace MemoryHierarchy
                 }
             }
 
-            indexBits = IndexAndOffset(numberOfSets);
-            
-            configOutput += ("\n" + $"Number of bits used for the index is {indexBits}.");
-            offsetBits = IndexAndOffset(lineSize);
-            configOutput += ("\n" + $"Number of bits used for the offset is {offsetBits}.");
+            DCIndexBits = IndexAndOffset(numberOfSets);
+
+            configOutput += ("\n" + $"Number of bits used for the index is {DCIndexBits}.");
+            DCOffSetBits = IndexAndOffset(lineSize);
+            configOutput += ("\n" + $"Number of bits used for the offset is {DCOffSetBits}.");
+
+            DCNumOfSets = numberOfSets;
+            DCNumOfEntries = setSize;
 
             NumberofSets = numberOfSets;
             SetSize = setSize;
@@ -354,17 +386,20 @@ namespace MemoryHierarchy
                 }
             }
 
-            indexBits = IndexAndOffset(numberOfSets);
-            configOutput += ("\n" + $"Number of bits used for the page table index is {indexBits}.");
-            offsetBits = IndexAndOffset(lineSize);
-            configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
+            L2IndexBits = IndexAndOffset(numberOfSets);
+            configOutput += ("\n" + $"Number of bits used for the page table index is {L2IndexBits}.");
+            L2OffsetBits = IndexAndOffset(lineSize);
+            configOutput += ("\n" + $"Number of bits used for the page offset is {L2OffsetBits}.");
+
+            L2NumOfSets = numberOfSets;
+            L2NumOfEntries = setSize;
         }
 
-        public double IndexAndOffset(int i)
+        public int IndexAndOffset(int i)
         {
-            double temp = 0;
+            int temp = 0;
             temp = i;
-            temp = Math.Log(temp, 2);
+            temp = (int)Math.Log(temp, 2);
             //temp = Math.Log2(temp);
             return temp;
         }

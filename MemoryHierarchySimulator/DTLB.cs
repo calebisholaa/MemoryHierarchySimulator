@@ -40,7 +40,7 @@ namespace MemoryHierarchySimulator
         public string SearchTLB(string tag)
         {
             string ppn;
-
+            
             if (OddOrEven(tag))
             {
                 for (int i = 0; i < evenTLB.Length; i++)
@@ -54,7 +54,7 @@ namespace MemoryHierarchySimulator
 
                 for (int i = 0; i < evenTLB.Length; i++)
                 {
-                    if (evenTLB[i].IsSetFull(tag) != true)
+                    if (!evenTLB[i].IsSetFull(tag))
                     {
                         return "empty";
                     }
@@ -76,7 +76,7 @@ namespace MemoryHierarchySimulator
                 for (int i = 0; i < oddTLB.Length; i++)
                 {
                     ppn = oddTLB[i].GetPPN(tag);
-                    if (ppn.Equals("empty") != true)
+                    if (!ppn.Equals("empty"))
                     {
                         return ppn;
                     }
@@ -84,7 +84,7 @@ namespace MemoryHierarchySimulator
 
                 for (int i = 0; i < oddTLB.Length; i++)
                 {
-                    if (oddTLB[i].IsSetFull(tag) != true)
+                    if (!oddTLB[i].IsSetFull(tag))
                     {
                         return "empty";
                     }
@@ -135,6 +135,9 @@ namespace MemoryHierarchySimulator
             bool even = false;
             switch (s)
             {
+                case "0":
+                    even = true;
+                    break;
                 case "1":
                     even = false;
                     break;

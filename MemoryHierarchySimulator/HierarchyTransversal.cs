@@ -20,9 +20,9 @@ namespace MemoryHierarchySimulator
         private string tLBResult = "";
         private string pTResult = "";
         private string physicalPageNumber = "";
-        private string dataCashTag = "";
-        private string dataCashInd = "";
-        private string dataCashResult = "";
+        private string dataCacheTag = "";
+        private string dataCacheInd = "";
+        private string dataCacheResult = "";
         private string l2Tag = "";
         private string l2Ind = "";
         private string l2Result = "";
@@ -46,16 +46,20 @@ namespace MemoryHierarchySimulator
         private int diskRefs = 0;
 
         private DTLB dTLB;
+        private Cache dataCache;
+        private Cache l2Cache;
 
         /// <summary>
         /// Simulates the Memory Hierarchy Transversal
         /// </summary>
-        public HierarchyTransversal(DTLB dTLB)
+        public HierarchyTransversal(OpenConfigFile openfile, List<string> hexAddress)
         {
-            this.dTLB = dTLB;
+            this.dTLB = new DTLB(openfile.DTLBSets, openfile.DTLBEntries);
 
-            PrintVirtualAddressesTable();
-            List<string> hexAddress = new List<string>(new string[] { "c84", "81c", "14c", "c84", "400", "148", "144", "c80", "008" });
+            dataCache = new Cache(openfile.DCIndexBits, openfile.DCOffSetBits, openfile.DCNumOfSets, openfile.DCNumOfEntries);
+            l2Cache = new Cache(openfile.L2IndexBits, openfile.L2OffsetBits, openfile.L2NumOfSets, openfile.L2NumOfEntries);
+
+            PrintVirtualAddressesTable();           
             foreach (string addr in hexAddress)
             {
                 tLBTag = "";
@@ -63,9 +67,9 @@ namespace MemoryHierarchySimulator
                 tLBResult = "";
                 pTResult = "";
                 physicalPageNumber = "";
-                dataCashTag = "";
-                dataCashInd = "";
-                dataCashResult = "";
+                dataCacheTag = "";
+                dataCacheInd = "";
+                dataCacheResult = "";
                 l2Tag = "";
                 l2Ind = "";
                 l2Result = "";
@@ -75,33 +79,6 @@ namespace MemoryHierarchySimulator
                 virtPageNumber = GetPageNum(virtAddress, 8, 4); //(virtAddress, openfile.OffSetBitsPage, openfile.IndexBitsPage)
                 pageOffset = GetPageOff(virtAddress, 8, 4); //(virtAddress, openfile.OffSetBitsPage, openfile.IndexBitsPage)
                 CheckTLB();
-                if (tLBResult.Equals("hit"))
-                {
-                    CheckdC();
-                    if (dataCashResult.Equals("miss"))
-                    {
-                        CheckL2();
-                        if (l2Result.Equals("miss"))
-                        {
-                            CheckMemoryAndDisk();
-                        }
-                    }
-
-
-                }
-                else
-                {
-                    CheckpT();
-                    if (dataCashResult.Equals("miss"))
-                    {
-                        CheckL2();
-                        if (l2Result.Equals("miss"))
-                        {
-                            CheckMemoryAndDisk();
-                        }
-                    }
-                }
-
                 PrintVirtualAddressesLine();
 
             }
@@ -127,7 +104,7 @@ namespace MemoryHierarchySimulator
         private void PrintVirtualAddressesLine()
         {
             Console.WriteLine("{0,-13} {1,-3} {2,-4} {3,-6} {4,-1} {5,-4} {6,-4} {7,-4} {8,-6} {9,-3} {10,-6} {11,-4} {12,-3} {13,-4}", virtAddress, virtPageNumber, pageOffset, tLBTag, tLBInd, tLBResult, pTResult,
-                physicalPageNumber, dataCashTag, dataCashInd, dataCashResult, l2Tag, l2Ind, l2Result);
+                physicalPageNumber, dataCacheTag, dataCacheInd, dataCacheResult, l2Tag, l2Ind, l2Result);
         }
 
         /// <summary>
@@ -138,18 +115,32 @@ namespace MemoryHierarchySimulator
         {
             string tLBSearchResults = dTLB.SearchTLB(virtPageNumber);
 
-            if (tLBSearchResults.Equals("empty") != true)
+            if (!tLBSearchResults.Equals("empty"))
             {
                 physicalPageNumber = tLBSearchResults;
+                physicalAddress = physicalPageNumber + pageOffset;
                 tLBResult = "hit";
                 dTLBHits++;
+                CheckdC();
             }
             else
             {
                 tLBResult = "miss";
                 dTLBMisses++;
+                CheckpT();
+                dTLB.SetPPN(virtPageNumber, DecimalToHex(PageTable.PhysicalPageNumber));
             }
-            
+
+            if (dTLB.OddOrEven(virtPageNumber))
+            {
+                tLBInd = "0";
+            }
+            else
+            {
+                tLBInd = "1";
+            }
+
+            tLBTag = HexToDecimal(virtPageNumber) / 2 + "";
             
         }
 
@@ -160,11 +151,9 @@ namespace MemoryHierarchySimulator
         private void CheckpT()
         {
 
-            //ToDo check the page table
-            if (PageTable.CheckPT(HexToDecimal(virtPageNumber)))
-            {
-                physicalAddress = PageTable.GetPhysicalPageNumber(HexToDecimal(virtPageNumber)) + pageOffset;
-                Console.WriteLine("Physical Addr: " + PageTable.GetPhysicalPageNumber(HexToDecimal(virtPageNumber)) + pageOffset);
+            pageTableRefs++;
+            if (!PageTable.CheckForPhysicalPageNumber(HexToDecimal(virtPageNumber)).Equals("empty"))
+            {               
                 pTResult = "hit";
                 pTHits++;
             }
@@ -172,8 +161,11 @@ namespace MemoryHierarchySimulator
             {
                 pTResult = "miss";
                 pTFaults++;
+                
             }
-            physicalPageNumber = PageTable.GetPhysicalPageNumber(HexToDecimal(virtPageNumber));
+            physicalAddress = DecimalToHex(PageTable.PhysicalPageNumber) + pageOffset;
+            physicalPageNumber = DecimalToHex(PageTable.PhysicalPageNumber);
+            CheckdC();
         }
 
         /// <summary>
@@ -181,7 +173,19 @@ namespace MemoryHierarchySimulator
         /// </summary>
         private void CheckdC()
         {
-
+            if (dataCache.SearchCache(physicalAddress))
+            {
+                dataCacheResult = "hit";
+                dCHits++;
+            }
+            else
+            {
+                dataCacheResult = "miss";
+                dCMisses++;
+                CheckL2();
+            }
+            dataCacheInd = BinaryToHex(dataCache.index);
+            dataCacheTag = BinaryToHex(dataCache.tag);
         }
 
         /// <summary>
@@ -189,7 +193,19 @@ namespace MemoryHierarchySimulator
         /// </summary>
         private void CheckL2()
         {
-
+            if (l2Cache.SearchCache(physicalAddress))
+            {
+                l2Result = "hit";
+                l2Hits++;
+            }
+            else
+            {
+                l2Result = "miss";
+                l2Misses++;
+                CheckMemoryAndDisk();
+            }
+            l2Ind = BinaryToHex(l2Cache.index);
+            l2Tag = BinaryToHex(l2Cache.tag);
         }
 
         /// <summary>
@@ -234,6 +250,11 @@ namespace MemoryHierarchySimulator
             return deci;
         }
 
+        public string DecimalToHex(int num)
+        {
+            return num.ToString("X");
+        }
+
         /// <summary>
         /// Calculates the page number
         /// </summary>
@@ -271,44 +292,37 @@ namespace MemoryHierarchySimulator
         /// </summary>
         private void PrintStats()
         {
+            double dTLBRatio = (double)dTLBHits / (dTLBMisses + dTLBHits);
+            double pTRatio = (double)pTHits / (pTFaults + pTHits);
+            double dCRatio = (double)dCHits / (dCMisses + dCHits);
+            double l2Ratio = (double)l2Hits / (l2Misses + l2Hits);
+            //double ReadWriteRatio = (double)totalReads / (totalWrites + totalReads);
+
             Console.WriteLine("\nSimulation statistics" +
                 "\ndTLB hits: " + dTLBHits +
                 "\ndTLB misses: " + dTLBMisses);
 
-            if (dTLBMisses != 0)
-                Console.WriteLine("dTLB hit ratio: " + dTLBHits / dTLBMisses);
-            else
-                Console.WriteLine("dTLB hit ratio: " + dTLBHits);
+            Console.WriteLine("dTLB hit ratio: " + dTLBRatio.ToString("P"));
 
             Console.WriteLine("pT hits: " + pTHits +
                 "\npT faults: " + pTFaults);
-            if (pTFaults != 0)
-                Console.WriteLine("pT hit ratio: " + pTHits / pTFaults);
-            else
-                Console.WriteLine("pT hit ratio: " + pTHits);
+
+            Console.WriteLine("pT hit ratio: " + pTRatio.ToString("P"));
 
             Console.WriteLine("dC hits: " + dCHits +
                 "\ndC misses: " + dCMisses);
-            if (dCMisses != 0)
-                Console.WriteLine("dC hit ratio: " + dCHits / dCMisses);
-            else
-                Console.WriteLine("dC hit ratio: " + dCHits);
+            
+            Console.WriteLine("dC hit ratio: " + dCRatio.ToString("P"));
 
             Console.WriteLine("L2 hits: " + l2Hits +
                 "\nL2 misses: " + l2Misses);
 
-            if (l2Misses != 0)
-                Console.WriteLine("L2 hit ratio: " + l2Hits / l2Misses);
-            else
-                Console.WriteLine("L2 hit ratio: " + l2Hits);
+            Console.WriteLine("L2 hit ratio: " + l2Ratio.ToString("P"));
 
             Console.WriteLine("Total reads: " + totalReads +
                 "\nTotal writes: " + totalWrites);
 
-            if (totalWrites != 0)
-                Console.WriteLine("Ratio of reads: " + totalReads / totalWrites);
-            else
-                Console.WriteLine("Ratio of reads: " + totalReads);
+           // Console.WriteLine("Ratio of reads: " + ReadWriteRatio.ToString("P"));
 
 
             Console.WriteLine("main memory refs: " + mainMemoryRefs +

@@ -24,9 +24,11 @@ namespace MemoryHierarchySimulator
 		static int pageOffset;
 		static int frameNumber;
 		static int frameOffest;
-		static bool[] presentTable;
 		static string[] addressTable;
-		static int pageNumberCounter;
+		static List<int> tableTracker;
+		static int lRUTracker;
+
+		static public int PhysicalPageNumber { get; set;  }
 		
 		public PageTable(int vp, int pp, int ms)//making of page tables, vp is amount of virtual pages, pp is amount of physical pages, ms is max size of each page
 		{
@@ -41,9 +43,15 @@ namespace MemoryHierarchySimulator
 			frameOffest = (int)Math.Log(physicalSize, 2) - frameNumber;
 			//presentTable = new bool[(int)Math.Pow(2, pageNumber)];//holds weather a specific page holds a value currently
 			//addressTable = new string[(int)Math.Pow(2, pageNumber)];//holds the physical address the page holds
-			presentTable = new bool[vp];
+			
 			addressTable = new string[vp];
-			pageNumberCounter = 0;
+			tableTracker = new List<int>(pp);// Used to track the pages for the LRU replacement
+			lRUTracker = 0;
+
+			for(int i = 0; i < vp; i++)
+			{
+				addressTable[i] = "empty";
+			}
 		}
 
 		static string GetPhysicalAddress(string address)
@@ -58,46 +66,58 @@ namespace MemoryHierarchySimulator
 			return Convert.ToString(Convert.ToInt64((phyAddress + offAddress), 2), 16);//combines the phyical address and the offset into one hexedecimal address
 		}
 
-		static bool GetPresentBit(string address)
-		{
-			string bitAddress = "00" + Convert.ToString(Convert.ToInt64(address, 16), 2);//convert hes address to individual bits
-			bitAddress = bitAddress.Remove(pageOffset);//remove all but the bits that identify where in the page table the physical address is.
-			int index = Convert.ToInt32(bitAddress, 2);
-			return presentTable[index];//returns whether or not the address would have anything to grab.
-		}
+		//static bool GetPresentBit(string address)
+		//{
+		//	string bitAddress = "00" + Convert.ToString(Convert.ToInt64(address, 16), 2);//convert hes address to individual bits
+		//	bitAddress = bitAddress.Remove(pageOffset);//remove all but the bits that identify where in the page table the physical address is.
+		//	int index = Convert.ToInt32(bitAddress, 2);
+		//	return presentTable[index];//returns whether or not the address would have anything to grab.
+		//}
+
 
 		/// <summary>
-		/// Checks the the page table is empty at that virtual page table entry.
+		/// Returns the physicalPageNumber or and empty value
+		/// Also uses LRU to replace the page tables.
 		/// </summary>
 		/// <param name="virtPage"></param>
-		/// <returns>bool true or false</returns>
-		static public bool CheckPT(int virtPage)
+		/// <returns>PhysicalPageNumber or empty</returns>
+		static public string CheckForPhysicalPageNumber(int virtPage)
 		{
-			if (presentTable[virtPage])
-			{
-				return true;
-			}
-
-			presentTable[virtPage] = true;
-			addressTable[virtPage] = pageNumberCounter + "";
-			pageNumberCounter++;
-
-			return false;
-		}
-
-		/// <summary>
-		/// Returns the physicalPageNumber
-		/// </summary>
-		/// <param name="virtPage"></param>
-		/// <returns>PhysicalPageNumber</returns>
-		static public string GetPhysicalPageNumber(int virtPage)
-		{
-			if (virtPage > addressTable.Length)
+			if (!tableTracker.Contains(virtPage))
 			{
 
-			}
+				
+				if (tableTracker.Count == numFrames)
+				{
+					addressTable[virtPage] = addressTable[tableTracker[0]];
+					addressTable[tableTracker[0]] = "empty";
+					tableTracker.RemoveAt(0);					
+					tableTracker.Insert(numFrames - 1, virtPage);
+					PhysicalPageNumber = Int32.Parse(addressTable[virtPage]);
 
-			return addressTable[virtPage];
+				}
+				else
+				{
+					tableTracker.Insert(lRUTracker, virtPage);
+					addressTable[virtPage] = lRUTracker + "";
+					lRUTracker++;
+					PhysicalPageNumber = Int32.Parse(addressTable[virtPage]);
+				}
+				
+				return "empty";
+				
+			}
+			else
+			{
+				PhysicalPageNumber = Int32.Parse(addressTable[virtPage]);
+				// Remove the indexes page
+				tableTracker.Remove(virtPage);
+
+				// insert the current page
+				tableTracker.Insert(tableTracker.Count, virtPage);
+
+				return PhysicalPageNumber + "";
+			}
 		}
 	}
 }
