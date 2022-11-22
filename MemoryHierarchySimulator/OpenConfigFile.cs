@@ -5,24 +5,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MemoryHierarchy
+namespace MemoryHierarchySimulator
 {
     public class OpenConfigFile
     {
         //Caleb added this
         //I need the local variables to be accessed in other classes 
-       
+
 
         public int NumberofSets { get; set; }
         public int SetSize { get; set; }
 
         public int LineSize { get; set; }
 
-        public double IndexBits { get; set; }
+        public int PageIndexBits { get; set; }
 
-        public double OffSetBits { get; set; }
+        public int PageOffSetBits { get; set; }
 
-        public string  WriteAllocate { get; set; }
+        public int DCIndexBits { get; set; }
+
+        public int DCOffSetBits { get; set; }
+
+        public int DCNumOfSets { get; set; }
+
+        public int DCNumOfEntries { get; set; }
+
+        public int L2IndexBits { get; set; }
+
+        public int L2OffsetBits { get; set; }
+
+        public int L2NumOfSets { get; set; }
+
+        public int L2NumOfEntries { get; set; }
+
+        public string WriteAllocate { get; set; }
 
         public string Word { get; set; }
 
@@ -31,7 +47,18 @@ namespace MemoryHierarchy
 
         public int PhysicalPages { get; set; }
 
-        public int PageSize { get; set; }  
+        public int PageSize { get; set; }
+
+        public int VirtualPages { get; set; }
+
+        public int DTLBSets { get; set; }
+
+        public int DTLBEntries { get; set; }
+
+        public bool TLBTorF { get; set; }
+        public bool VATorF { get; set; }
+        public bool L2TorF { get; set; }
+
         //end of properties 
 
 
@@ -42,6 +69,11 @@ namespace MemoryHierarchy
         public string[] almostSplitContents = null;
         public string[] individualWords = null;
         public string configOutput = null;
+
+        public OpenConfigFile()
+        {
+
+        }
 
         public void ReadFile()
         {
@@ -100,6 +132,22 @@ namespace MemoryHierarchy
                     arrayMarker = i;
                     SetL2();
                 }
+                if (splitContents[i] == "Virtual" && splitContents[i + 1] == "addresses:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+                if (splitContents[i] == "TLB:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+                if (splitContents[i] == "L2" && splitContents[i + 1] == "cache:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+
             }
 
             Console.WriteLine(configOutput);
@@ -143,7 +191,10 @@ namespace MemoryHierarchy
             indexBits = IndexAndOffset(numberOfSets);
             configOutput += ("\n" + $"Number of bits used for the index is {indexBits}");
 
+            DTLBSets = numberOfSets;
+            DTLBEntries = setSize;
         }
+
 
         public void SetPageTable()
         {
@@ -151,8 +202,6 @@ namespace MemoryHierarchy
             int virtualPages = 0;
             int physicalPages = 0;
             int pageSize = 0;
-            double indexBits = 0;
-            double offsetBits = 0;
             string word = null;
             string temp = null;
             for (int i = 0; i < arrayLength; i++)
@@ -196,13 +245,15 @@ namespace MemoryHierarchy
                 }
             }
 
-            indexBits = IndexAndOffset(virtualPages);
-            configOutput += ("\n" + $"Number of bits used for the page table index is {indexBits}.");
-            offsetBits = IndexAndOffset(pageSize);
-            configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
+            PageIndexBits = IndexAndOffset(virtualPages);
+            configOutput += ("\n" + $"Number of bits used for the page table index is {PageIndexBits}.");
+            PageOffSetBits = IndexAndOffset(pageSize);
+            configOutput += ("\n" + $"Number of bits used for the page offset is {PageOffSetBits}.");
+
 
             PhysicalPages = physicalPages;
             PageSize = pageSize;
+            VirtualPages = virtualPages;
         }
 
         public void SetDataCache()
@@ -211,13 +262,13 @@ namespace MemoryHierarchy
             int numberOfSets = 0;
             int setSize = 0;
             int lineSize = 0;
-            double indexBits = 0.0;
-            double offsetBits = 0.0;
+            int indexBits = 0;
+            int offsetBits = 0;
             string writeAllocate = null;
             string word = null;
             string temp = null;
 
-           
+
 
             for (int i = arrayMarker; i < arrayLength; i++)
             {
@@ -272,17 +323,18 @@ namespace MemoryHierarchy
                 }
             }
 
-            indexBits = IndexAndOffset(numberOfSets);
-            
-            configOutput += ("\n" + $"Number of bits used for the index is {indexBits}.");
-            offsetBits = IndexAndOffset(lineSize);
-            configOutput += ("\n" + $"Number of bits used for the offset is {offsetBits}.");
+            DCIndexBits = IndexAndOffset(numberOfSets);
+
+            configOutput += ("\n" + $"Number of bits used for the index is {DCIndexBits}.");
+            DCOffSetBits = IndexAndOffset(lineSize);
+            configOutput += ("\n" + $"Number of bits used for the offset is {DCOffSetBits}.");
+
+            DCNumOfSets = numberOfSets;
+            DCNumOfEntries = setSize;
 
             NumberofSets = numberOfSets;
             SetSize = setSize;
             LineSize = lineSize;
-            IndexBits = indexBits;
-            OffSetBits = offsetBits;
             WriteAllocate = writeAllocate;
             Word = word;
             Temp = temp;
@@ -351,17 +403,83 @@ namespace MemoryHierarchy
                 }
             }
 
-            indexBits = IndexAndOffset(numberOfSets);
-            configOutput += ("\n" + $"Number of bits used for the page table index is {indexBits}.");
-            offsetBits = IndexAndOffset(lineSize);
-            configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
+            L2IndexBits = IndexAndOffset(numberOfSets);
+            configOutput += ("\n" + $"Number of bits used for the page table index is {L2IndexBits}.");
+            L2OffsetBits = IndexAndOffset(lineSize);
+            configOutput += ("\n" + $"Number of bits used for the page offset is {L2OffsetBits}.");
+
+            L2NumOfSets = numberOfSets;
+            L2NumOfEntries = setSize;
         }
 
-        public double IndexAndOffset(int i)
+        public void SetMisc()
         {
-            double temp = 0;
+
+            for (int i = arrayMarker; i < arrayLength; i++)
+            {
+                string vAddress = " ";
+                string TLB = " ";
+                string L2Cache = " ";
+
+
+                if (splitContents[i] == "addresses:")
+                {
+                    vAddress = splitContents[i + 1];
+                    vAddress = vAddress.ToLower();
+                    while (vAddress != "y" && vAddress != "n")
+                    {
+                        Console.WriteLine("Would you like to use virtual addresses? Please input y or n.");
+                        vAddress = Console.ReadLine();
+                    }
+
+                    if (vAddress.Equals("y"))
+                    {
+                        VATorF = true;
+                    }
+
+                    if (VATorF)
+                    {
+                        configOutput += "\n\nThe addresses read in are virtual addresses.";
+                    }
+                }
+                if (splitContents[i] == "TLB:")
+                {
+                    TLB = splitContents[i + 1];
+                    TLB = TLB.ToLower();
+                    while (TLB != "y" && TLB != "n")
+                    {
+                        Console.WriteLine("Would you like to use the TLB? Please input y or n.");
+                        TLB = Console.ReadLine();
+                    }
+
+                    if (TLB.Equals("y"))
+                    {
+                        TLBTorF = true;
+                    }
+                }
+                if (splitContents[i] == "L2" && splitContents[i + 1] == "cache:")
+                {
+                    L2Cache = splitContents[i + 2];
+                    L2Cache = L2Cache.ToLower();
+                    while (L2Cache != "y" && L2Cache != "n")
+                    {
+                        Console.WriteLine("Would you like to use the L2 cache? Please input y or n.");
+                        L2Cache = Console.ReadLine();
+                    }
+
+                    if (L2Cache.Equals("y"))
+                    {
+                        L2TorF = true;
+                    }
+                }
+            }
+        }
+
+        public int IndexAndOffset(int i)
+        {
+            int temp = 0;
             temp = i;
-            temp = Math.Log(temp, 2);
+            temp = (int)Math.Log(temp, 2);
             //temp = Math.Log2(temp);
             return temp;
         }

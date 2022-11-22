@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace MemoryHierarchySimulator
 {
@@ -12,106 +11,50 @@ namespace MemoryHierarchySimulator
     {
        public List<string> accessType = new List<string>();
        public List<string> hexAddress = new List<string>();
-        string filePath = "";
-        string fileContent = "";
-        public void OpenReadFile()
+
+        public int arrayLength = 0;
+        public int arrayMarker = 0;
+        public string[] fileContents = null;
+
+
+
+        public void ReadFile()
         {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            string filePath = " ";
+            bool keepGoing = true;
+            int position;
+
+            while (keepGoing)
             {
-                openFileDialog.InitialDirectory = "c:\\";
-                openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-                openFileDialog.FilterIndex = 2;
-                openFileDialog.RestoreDirectory = true;
+                Console.WriteLine("\nPlease enter the file path for the trace file.");
+                filePath = Console.ReadLine();
 
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                try
                 {
-                    //Get the path of specified file
-                    this.filePath = openFileDialog.FileName;
-
-                    //Read the contents of the file into a stream
-                    var fileStream = openFileDialog.OpenFile();
-
-                    using (StreamReader reader = new StreamReader(fileStream))
+                    using (StreamReader sr = File.OpenText(filePath))
                     {
-                        this.fileContent = reader.ReadToEnd();
+                        Console.WriteLine("File open.");
+                        keepGoing = false;
                     }
                 }
-
-            }
-        }
-
-        public void OpenAndParse()
-        {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.InitialDirectory = "c:\\";
-                openFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-                openFileDialog.FilterIndex = 2;
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                catch (Exception e)
                 {
-                    //Get the path of specified file
-                    this.filePath = openFileDialog.FileName;
-
-                    //Read the contents of the file into a stream
-                    var fileStream = openFileDialog.OpenFile();
-
-
-
-                    using (StreamReader reader = new StreamReader(fileStream))
-                    {
-                        var lineCounter = 0;
-                        while (!reader.EndOfStream)
-                        {
-                            var line = reader.ReadLine();
-                            var values = line.Split(':');
-
-                            if (values.Length == 1)
-                            {
-                               
-
-                            }
-                            else
-                            {
-                                accessType.Add(values[0]);
-                                hexAddress.Add(values[1]);
-
-                                
-
-                                lineCounter++;
-                            }
-
-
-
-                        }
-
-
-
-
-                        reader.Close();
-
-                    }
+                    Console.WriteLine($"The file could not be opened: '{e}'");
                 }
-
             }
-        }
 
-
-
-        public void OpenTrace()
-        {
-            OpenAndParse();
-
-            Print();
-        }
-
-        public void Print()
-        {
-            for (int i = 0; i < hexAddress.Count; i++)
+            fileContents = File.ReadAllText(filePath).Split('\n');
+            foreach (string line in fileContents)
             {
-                Console.WriteLine(accessType[i] + ":" + hexAddress[i]);
+                position = line.IndexOf(":");
+                if (position > 0)
+                {
+                    accessType.Add(line.Substring(0, position));
+                    hexAddress.Add(line.Substring(position + 1));
+                }
             }
+
+
         }
     }
 }
