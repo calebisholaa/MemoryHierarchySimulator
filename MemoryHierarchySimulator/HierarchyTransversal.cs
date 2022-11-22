@@ -177,7 +177,8 @@ namespace MemoryHierarchySimulator
 
                 if (PageTable.PageRemoved)
                 {
-                    
+                    dataCache.RemoveEntries(DecimalToHex(PageTable.PhysicalPageNumber));
+                    l2Cache.RemoveEntries(DecimalToHex(PageTable.PhysicalPageNumber));
                 }
             }           
             physicalPageNumber = DecimalToHex(PageTable.PhysicalPageNumber);
@@ -190,7 +191,7 @@ namespace MemoryHierarchySimulator
         /// </summary>
         private void CheckdC()
         {
-            if (dataCache.SearchCache(physicalAddress))
+            if (dataCache.SearchCache(physicalAddress, physicalPageNumber))
             {
                 dataCacheResult = "hit";
                 dCHits++;
@@ -210,7 +211,7 @@ namespace MemoryHierarchySimulator
         /// </summary>
         private void CheckL2()
         {
-            if (l2Cache.SearchCache(physicalAddress))
+            if (l2Cache.SearchCache(physicalAddress, physicalPageNumber))
             {
                 l2Result = "hit";
                 l2Hits++;

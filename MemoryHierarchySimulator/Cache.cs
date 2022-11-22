@@ -33,7 +33,7 @@ namespace MemoryHierarchySimulator
             }
         }
 
-        public bool SearchCache(string physicalAddress)
+        public bool SearchCache(string physicalAddress, string physicalPageNumber)
         {
             offset = "";
             index = "";
@@ -41,7 +41,7 @@ namespace MemoryHierarchySimulator
 
             ReadPhysicalAddress(physicalAddress);
 
-            if (cache[BinaryToDecimal(index)].SearchCache(tag, offset))
+            if (cache[BinaryToDecimal(index)].SearchCache(tag, offset, physicalPageNumber))
             {
                 return true;
             }
@@ -70,6 +70,14 @@ namespace MemoryHierarchySimulator
             }
         }
 
+        public void RemoveEntries(string physicalPageNumber)
+        {
+            foreach (CacheSet set in cache)
+            {
+                set.RemoveEntries(physicalPageNumber);
+            }
+        }
+
         /// <summary>
         /// Converts hex to binary
         /// </summary>
@@ -90,10 +98,12 @@ namespace MemoryHierarchySimulator
     public class CacheEntry
     {
         private string tag;
+        public string PhysicalPageNumber { get; set; }
 
-        public CacheEntry(string tag, string offset)
+        public CacheEntry(string tag, string offset, string physicalPageNumber)
         {
             this.tag = tag;
+            this.PhysicalPageNumber = physicalPageNumber;
         }
 
         public bool CompareToEntry(string tag)
@@ -122,7 +132,7 @@ namespace MemoryHierarchySimulator
             lRUTracker = 0;
         }
 
-        public bool SearchCache(string tag, string offset)
+        public bool SearchCache(string tag, string offset, string physicalPageNumber)
         {
             bool doesContain = false;
             int foundAt = 0;
@@ -147,13 +157,13 @@ namespace MemoryHierarchySimulator
                 if (cacheEntries.Count == numOfEntries)
                 {
                     cacheEntries.RemoveAt(0);
-                    cacheEntries.Insert(numOfEntries - 1, new CacheEntry(tag, offset));
+                    cacheEntries.Insert(numOfEntries - 1, new CacheEntry(tag, offset, physicalPageNumber));
 
 
                 }
                 else
                 {
-                    cacheEntries.Insert(lRUTracker, new CacheEntry(tag, offset));
+                    cacheEntries.Insert(lRUTracker, new CacheEntry(tag, offset, physicalPageNumber));
                     lRUTracker++;
                 }
 
@@ -166,9 +176,21 @@ namespace MemoryHierarchySimulator
                 cacheEntries.RemoveAt(foundAt);
 
                 // insert the current page
-                cacheEntries.Insert(cacheEntries.Count, new CacheEntry(tag, offset));
+                cacheEntries.Insert(cacheEntries.Count, new CacheEntry(tag, offset, physicalPageNumber));
 
                 return true;
+            }
+        }
+
+        public void RemoveEntries(string physicalPageNumber)
+        {
+            for(int i = 0; i < cacheEntries.Count; i++)
+            {
+                if (cacheEntries[i].PhysicalPageNumber.Equals(physicalPageNumber))
+                {
+                    cacheEntries.RemoveAt(i);
+                    lRUTracker--;
+                }
             }
         }
     }
