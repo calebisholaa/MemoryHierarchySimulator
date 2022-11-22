@@ -18,9 +18,9 @@ namespace MemoryHierarchySimulator
 
         public int LineSize { get; set; }
 
-        public int IndexBits { get; set; }
+        public int PageIndexBits { get; set; }
 
-        public int OffSetBits { get; set; }
+        public int PageOffSetBits { get; set; }
 
         public int DCIndexBits { get; set; }
 
@@ -182,8 +182,6 @@ namespace MemoryHierarchySimulator
             int virtualPages = 0;
             int physicalPages = 0;
             int pageSize = 0;
-            double indexBits = 0;
-            double offsetBits = 0;
             string word = null;
             string temp = null;
             for (int i = 0; i < arrayLength; i++)
@@ -227,10 +225,11 @@ namespace MemoryHierarchySimulator
                 }
             }
 
-            indexBits = IndexAndOffset(virtualPages);
-            configOutput += ("\n" + $"Number of bits used for the page table index is {indexBits}.");
-            offsetBits = IndexAndOffset(pageSize);
-            configOutput += ("\n" + $"Number of bits used for the page offset is {offsetBits}.");
+            PageIndexBits = IndexAndOffset(virtualPages);
+            configOutput += ("\n" + $"Number of bits used for the page table index is {PageIndexBits}.");
+            PageOffSetBits = IndexAndOffset(pageSize);
+            configOutput += ("\n" + $"Number of bits used for the page offset is {PageOffSetBits}.");
+
 
             PhysicalPages = physicalPages;
             PageSize = pageSize;
@@ -316,8 +315,6 @@ namespace MemoryHierarchySimulator
             NumberofSets = numberOfSets;
             SetSize = setSize;
             LineSize = lineSize;
-            IndexBits = indexBits;
-            OffSetBits = offsetBits;
             WriteAllocate = writeAllocate;
             Word = word;
             Temp = temp;

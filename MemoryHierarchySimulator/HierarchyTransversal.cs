@@ -45,6 +45,7 @@ namespace MemoryHierarchySimulator
         private int pageTableRefs = 0;
         private int diskRefs = 0;
 
+        private OpenConfigFile openFile;
         private DTLB dTLB;
         private Cache dataCache;
         private Cache l2Cache;
@@ -52,12 +53,24 @@ namespace MemoryHierarchySimulator
         /// <summary>
         /// Simulates the Memory Hierarchy Transversal
         /// </summary>
-        public HierarchyTransversal(OpenConfigFile openfile, List<string> hexAddress)
+        public HierarchyTransversal(OpenConfigFile openfile, List<string> hexAddress, List<string> accessType)
         {
+            this.openFile = openfile;
             this.dTLB = new DTLB(openfile.DTLBSets, openfile.DTLBEntries);
-
             dataCache = new Cache(openfile.DCIndexBits, openfile.DCOffSetBits, openfile.DCNumOfSets, openfile.DCNumOfEntries);
             l2Cache = new Cache(openfile.L2IndexBits, openfile.L2OffsetBits, openfile.L2NumOfSets, openfile.L2NumOfEntries);
+
+            foreach (string line in accessType)
+            {
+                if (line.Equals("R"))
+                {
+                    totalReads++;
+                }
+                else
+                {
+                    totalWrites++;
+                }
+            }
 
             PrintVirtualAddressesTable();           
             foreach (string addr in hexAddress)
@@ -76,8 +89,8 @@ namespace MemoryHierarchySimulator
                 physicalAddress = "";
 
                 virtAddress = addr.PadLeft(8, '0');
-                virtPageNumber = GetPageNum(virtAddress, 8, 4); //(virtAddress, openfile.OffSetBitsPage, openfile.IndexBitsPage)
-                pageOffset = GetPageOff(virtAddress, 8, 4); //(virtAddress, openfile.OffSetBitsPage, openfile.IndexBitsPage)
+                virtPageNumber = GetPageNum(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits);
+                pageOffset = GetPageOff(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits); 
                 CheckTLB();
                 PrintVirtualAddressesLine();
 
@@ -118,7 +131,7 @@ namespace MemoryHierarchySimulator
             if (!tLBSearchResults.Equals("empty"))
             {
                 physicalPageNumber = tLBSearchResults;
-                physicalAddress = physicalPageNumber + pageOffset;
+                physicalAddress = physicalPageNumber + pageOffset.PadLeft(openFile.PageOffSetBits / 4, '0');
                 tLBResult = "hit";
                 dTLBHits++;
                 CheckdC();
@@ -161,10 +174,14 @@ namespace MemoryHierarchySimulator
             {
                 pTResult = "miss";
                 pTFaults++;
-                
-            }
-            physicalAddress = DecimalToHex(PageTable.PhysicalPageNumber) + pageOffset;
+
+                if (PageTable.PageRemoved)
+                {
+                    
+                }
+            }           
             physicalPageNumber = DecimalToHex(PageTable.PhysicalPageNumber);
+            physicalAddress = physicalPageNumber + pageOffset.PadLeft(openFile.PageOffSetBits / 4, '0');
             CheckdC();
         }
 
@@ -296,7 +313,7 @@ namespace MemoryHierarchySimulator
             double pTRatio = (double)pTHits / (pTFaults + pTHits);
             double dCRatio = (double)dCHits / (dCMisses + dCHits);
             double l2Ratio = (double)l2Hits / (l2Misses + l2Hits);
-            //double ReadWriteRatio = (double)totalReads / (totalWrites + totalReads);
+            double ReadWriteRatio = (double)totalReads / (totalWrites + totalReads);
 
             Console.WriteLine("\nSimulation statistics" +
                 "\ndTLB hits: " + dTLBHits +
@@ -322,7 +339,7 @@ namespace MemoryHierarchySimulator
             Console.WriteLine("Total reads: " + totalReads +
                 "\nTotal writes: " + totalWrites);
 
-           // Console.WriteLine("Ratio of reads: " + ReadWriteRatio.ToString("P"));
+            Console.WriteLine("Ratio of reads: " + ReadWriteRatio.ToString("P"));
 
 
             Console.WriteLine("main memory refs: " + mainMemoryRefs +

@@ -12,22 +12,19 @@ namespace MemoryHierarchySimulator
         {
             Intro();
             OpenConfigFile openfile = new OpenConfigFile();
-            //OpenTraceFile openTraceFile = new OpenTraceFile();
+            OpenTraceFile openTraceFile = new OpenTraceFile();
             
             openfile.ReadFile();
 
             Console.WriteLine();
-            Console.WriteLine("Open Trace File...press Enter to select file.");
-            Console.ReadKey();
-            //openTraceFile.OpenTrace();
+            openTraceFile.ReadFile();
             Console.WriteLine();
             Console.WriteLine();
 
             //cache.CreateCaches();
             PageTable pages = new PageTable(openfile.VirtualPages, openfile.PhysicalPages, openfile.PageSize);
-            List<string> hexAddress = new List<string>(new string[] { "c84", "81c", "14c", "c84", "400", "148", "144", "c80", "008" });
-            
-            HierarchyTransversal hierarchyTransversal = new HierarchyTransversal(openfile, hexAddress);
+
+            HierarchyTransversal hierarchyTransversal = new HierarchyTransversal(openfile, openTraceFile.hexAddress, openTraceFile.accessType);
         }
 
 

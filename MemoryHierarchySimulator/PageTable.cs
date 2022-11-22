@@ -29,6 +29,8 @@ namespace MemoryHierarchySimulator
 		static int lRUTracker;
 
 		static public int PhysicalPageNumber { get; set;  }
+
+		static public bool PageRemoved { get; set; }
 		
 		public PageTable(int vp, int pp, int ms)//making of page tables, vp is amount of virtual pages, pp is amount of physical pages, ms is max size of each page
 		{
@@ -83,6 +85,8 @@ namespace MemoryHierarchySimulator
 		/// <returns>PhysicalPageNumber or empty</returns>
 		static public string CheckForPhysicalPageNumber(int virtPage)
 		{
+			PageRemoved = false;
+
 			if (!tableTracker.Contains(virtPage))
 			{
 
@@ -94,6 +98,7 @@ namespace MemoryHierarchySimulator
 					tableTracker.RemoveAt(0);					
 					tableTracker.Insert(numFrames - 1, virtPage);
 					PhysicalPageNumber = Int32.Parse(addressTable[virtPage]);
+					PageRemoved = true;
 
 				}
 				else
