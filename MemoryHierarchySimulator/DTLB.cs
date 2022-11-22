@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace MemoryHierarchySimulator
 {
+    /// <summary>
+    /// Handles the DTLB
+    /// </summary>
     public class DTLB
     {
         DTLBSet[] evenTLB;
@@ -13,6 +16,11 @@ namespace MemoryHierarchySimulator
         int lastSetReplaced;
         int numOfSets;
 
+        /// <summary>
+        /// Constructor for DTLB
+        /// </summary>
+        /// <param name="numOfSets">Number of sets for the cache</param>
+        /// <param name="setSize">Number of entries for each set</param>
         public DTLB(int numOfSets, int setSize)
         {
             this.numOfSets = numOfSets;

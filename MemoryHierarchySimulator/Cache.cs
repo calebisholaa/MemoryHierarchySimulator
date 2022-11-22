@@ -10,6 +10,9 @@ using Microsoft.Win32;
 
 namespace MemoryHierarchySimulator
 {
+    /// <summary>
+    /// Handles the Caches for the Memory Hierarchy Transversal
+    /// </summary>
     public class Cache
     {
         private string offset;
@@ -20,6 +23,13 @@ namespace MemoryHierarchySimulator
         public string index { get; set; }
         public string tag { get; set; }
 
+        /// <summary>
+        /// Constructor for the Cache
+        /// </summary>
+        /// <param name="indexBits">number of bits for the index</param>
+        /// <param name="offsetBits">number of bits for the offset</param>
+        /// <param name="numOfSets">number of sets</param>
+        /// <param name="numOfEntries">number of entries per set</param>
         public Cache(int indexBits, int offsetBits, int numOfSets, int numOfEntries)
         {
             this.indexBits = indexBits;
@@ -33,6 +43,12 @@ namespace MemoryHierarchySimulator
             }
         }
 
+        /// <summary>
+        /// Searchs the cache for the physical Address.
+        /// </summary>
+        /// <param name="physicalAddress">the physical address</param>
+        /// <param name="physicalPageNumber">the physical page number</param>
+        /// <returns>true if found</returns>
         public bool SearchCache(string physicalAddress, string physicalPageNumber)
         {
             offset = "";
@@ -49,6 +65,10 @@ namespace MemoryHierarchySimulator
             return false;
         }
 
+        /// <summary>
+        /// Reads the physical address into the offset, index, and tag.
+        /// </summary>
+        /// <param name="physicalAddress">the physical address</param>
         private void ReadPhysicalAddress(string physicalAddress)
         {
             string convertedAddress = HexToBinary(physicalAddress); 
@@ -70,6 +90,10 @@ namespace MemoryHierarchySimulator
             }
         }
 
+        /// <summary>
+        /// Removes all the entries with on that physical page
+        /// </summary>
+        /// <param name="physicalPageNumber"></param>
         public void RemoveEntries(string physicalPageNumber)
         {
             foreach (CacheSet set in cache)
@@ -89,23 +113,42 @@ namespace MemoryHierarchySimulator
             return binary;
         }
 
+        /// <summary>
+        /// Binary to Decimal
+        /// </summary>
+        /// <param name="binary"></param>
+        /// <returns>Decimal value of the binary</returns>
         private int BinaryToDecimal(string binary)
         {
             return Convert.ToInt32(binary, 2);
         }
     }
 
+    /// <summary>
+    /// Handles a single CacheEntry
+    /// </summary>
     public class CacheEntry
     {
         private string tag;
         public string PhysicalPageNumber { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="offset"></param>
+        /// <param name="physicalPageNumber"></param>
         public CacheEntry(string tag, string offset, string physicalPageNumber)
         {
             this.tag = tag;
             this.PhysicalPageNumber = physicalPageNumber;
         }
 
+        /// <summary>
+        /// Compares the entry tags
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns>true is they are equal</returns>
         public bool CompareToEntry(string tag)
         {
             if (this.tag.Equals(tag))
@@ -117,6 +160,9 @@ namespace MemoryHierarchySimulator
         }
     }
 
+    /// <summary>
+    /// Handles a set of the cache
+    /// </summary>
     public class CacheSet
     {
         public string set { get; }
@@ -125,6 +171,10 @@ namespace MemoryHierarchySimulator
         private List<CacheEntry> cacheEntries;
         private int lRUTracker;
 
+        /// <summary>
+        /// Constructor for Cacheset
+        /// </summary>
+        /// <param name="numOfEntries">number of entries in the set</param>
         public CacheSet(int numOfEntries)
         {
             cacheEntries = new List<CacheEntry>(numOfEntries);
@@ -132,6 +182,13 @@ namespace MemoryHierarchySimulator
             lRUTracker = 0;
         }
 
+        /// <summary>
+        /// Searches the cache for an entry
+        /// </summary>
+        /// <param name="tag">the tag</param>
+        /// <param name="offset">the offset</param>
+        /// <param name="physicalPageNumber"> the physical page number</param>
+        /// <returns>true is found</returns>
         public bool SearchCache(string tag, string offset, string physicalPageNumber)
         {
             bool doesContain = false;
@@ -182,6 +239,10 @@ namespace MemoryHierarchySimulator
             }
         }
 
+        /// <summary>
+        /// Removes all the entries attach to the physical page
+        /// </summary>
+        /// <param name="physicalPageNumber">the physical page number</param>
         public void RemoveEntries(string physicalPageNumber)
         {
             for(int i = 0; i < cacheEntries.Count; i++)
