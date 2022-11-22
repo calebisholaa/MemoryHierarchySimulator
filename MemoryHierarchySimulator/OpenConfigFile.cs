@@ -55,6 +55,10 @@ namespace MemoryHierarchySimulator
 
         public int DTLBEntries { get; set; }
 
+        public bool TLBTorF { get; set; }
+        public bool VATorF { get; set; }
+        public bool L2TorF { get; set; }
+
         //end of properties 
 
 
@@ -68,7 +72,7 @@ namespace MemoryHierarchySimulator
 
         public OpenConfigFile()
         {
-            
+
         }
 
         public void ReadFile()
@@ -128,6 +132,22 @@ namespace MemoryHierarchySimulator
                     arrayMarker = i;
                     SetL2();
                 }
+                if (splitContents[i] == "Virtual" && splitContents[i + 1] == "addresses:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+                if (splitContents[i] == "TLB:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+                if (splitContents[i] == "L2" && splitContents[i + 1] == "cache:")
+                {
+                    arrayMarker = i;
+                    SetMisc();
+                }
+
             }
 
             Console.WriteLine(configOutput);
@@ -174,7 +194,7 @@ namespace MemoryHierarchySimulator
             DTLBSets = numberOfSets;
             DTLBEntries = setSize;
         }
-     
+
 
         public void SetPageTable()
         {
@@ -390,6 +410,69 @@ namespace MemoryHierarchySimulator
 
             L2NumOfSets = numberOfSets;
             L2NumOfEntries = setSize;
+        }
+
+        public void SetMisc()
+        {
+
+            for (int i = arrayMarker; i < arrayLength; i++)
+            {
+                string vAddress = " ";
+                string TLB = " ";
+                string L2Cache = " ";
+
+
+                if (splitContents[i] == "addresses:")
+                {
+                    vAddress = splitContents[i + 1];
+                    vAddress = vAddress.ToLower();
+                    while (vAddress != "y" && vAddress != "n")
+                    {
+                        Console.WriteLine("Would you like to use virtual addresses? Please input y or n.");
+                        vAddress = Console.ReadLine();
+                    }
+
+                    if (vAddress.Equals("y"))
+                    {
+                        VATorF = true;
+                    }
+
+                    if (VATorF)
+                    {
+                        configOutput += "\n\nThe addresses read in are virtual addresses.";
+                    }
+                }
+                if (splitContents[i] == "TLB:")
+                {
+                    TLB = splitContents[i + 1];
+                    TLB = TLB.ToLower();
+                    while (TLB != "y" && TLB != "n")
+                    {
+                        Console.WriteLine("Would you like to use the TLB? Please input y or n.");
+                        TLB = Console.ReadLine();
+                    }
+
+                    if (TLB.Equals("y"))
+                    {
+                        TLBTorF = true;
+                    }
+                }
+                if (splitContents[i] == "L2" && splitContents[i + 1] == "cache:")
+                {
+                    L2Cache = splitContents[i + 2];
+                    L2Cache = L2Cache.ToLower();
+                    while (L2Cache != "y" && L2Cache != "n")
+                    {
+                        Console.WriteLine("Would you like to use the L2 cache? Please input y or n.");
+                        L2Cache = Console.ReadLine();
+                    }
+
+                    if (L2Cache.Equals("y"))
+                    {
+                        L2TorF = true;
+                    }
+                }
+            }
         }
 
         public int IndexAndOffset(int i)

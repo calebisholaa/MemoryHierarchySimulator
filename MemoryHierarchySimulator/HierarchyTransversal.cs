@@ -72,32 +72,87 @@ namespace MemoryHierarchySimulator
                 }
             }
 
-            PrintVirtualAddressesTable();           
-            foreach (string addr in hexAddress)
+            PrintVirtualAddressesTable();
+            
+            if (!openFile.VATorF)
             {
-                tLBTag = "";
-                tLBInd = "";
-                tLBResult = "";
-                pTResult = "";
-                physicalPageNumber = "";
-                dataCacheTag = "";
-                dataCacheInd = "";
-                dataCacheResult = "";
-                l2Tag = "";
-                l2Ind = "";
-                l2Result = "";
-                physicalAddress = "";
+                foreach (string addr in hexAddress)
+                {
+                    tLBTag = "";
+                    tLBInd = "";
+                    tLBResult = "";
+                    pTResult = "";
+                    physicalPageNumber = "";
+                    dataCacheTag = "";
+                    dataCacheInd = "";
+                    dataCacheResult = "";
+                    l2Tag = "";
+                    l2Ind = "";
+                    l2Result = "";
+                    physicalAddress = "";
 
-                virtAddress = addr.PadLeft(8, '0');
-                virtPageNumber = GetPageNum(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits);
-                pageOffset = GetPageOff(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits); 
-                CheckTLB();
-                PrintVirtualAddressesLine();
+                    //physicalPageNumber = DecimalToHex(PageTable.PhysicalPageNumber);
+                    physicalAddress = addr.PadLeft(openFile.PageOffSetBits / 4, '0');
+                    CheckdC();
+                    PrintVirtualAddressesLine();
 
+                }
+            }
+            else if (openFile.TLBTorF)
+            {
+                foreach (string addr in hexAddress)
+                {
+                    tLBTag = "";
+                    tLBInd = "";
+                    tLBResult = "";
+                    pTResult = "";
+                    physicalPageNumber = "";
+                    dataCacheTag = "";
+                    dataCacheInd = "";
+                    dataCacheResult = "";
+                    l2Tag = "";
+                    l2Ind = "";
+                    l2Result = "";
+                    physicalAddress = "";
+
+                    virtAddress = addr.PadLeft(8, '0');
+                    virtPageNumber = GetPageNum(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits);
+                    pageOffset = GetPageOff(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits);
+                    CheckTLB();
+                    PrintVirtualAddressesLine();
+
+                }
+            }
+            else
+            {
+                foreach (string addr in hexAddress)
+                {
+                    tLBTag = "";
+                    tLBInd = "";
+                    tLBResult = "";
+                    pTResult = "";
+                    physicalPageNumber = "";
+                    dataCacheTag = "";
+                    dataCacheInd = "";
+                    dataCacheResult = "";
+                    l2Tag = "";
+                    l2Ind = "";
+                    l2Result = "";
+                    physicalAddress = "";
+
+                    
+                    virtAddress = addr.PadLeft(8, '0');
+                    virtPageNumber = GetPageNum(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits);
+                    pageOffset = GetPageOff(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits);
+                    CheckpT();
+                    PrintVirtualAddressesLine();
+
+                }
             }
 
             PrintStats();
         }
+
 
         /// <summary>
         /// Prints the header for the Virtual Addresses Table
@@ -178,7 +233,11 @@ namespace MemoryHierarchySimulator
                 if (PageTable.PageRemoved)
                 {
                     dataCache.RemoveEntries(DecimalToHex(PageTable.PhysicalPageNumber));
-                    l2Cache.RemoveEntries(DecimalToHex(PageTable.PhysicalPageNumber));
+                    if (openFile.L2TorF)
+                    {
+                        l2Cache.RemoveEntries(DecimalToHex(PageTable.PhysicalPageNumber));
+                    }
+                    
                 }
             }           
             physicalPageNumber = DecimalToHex(PageTable.PhysicalPageNumber);
@@ -200,7 +259,10 @@ namespace MemoryHierarchySimulator
             {
                 dataCacheResult = "miss";
                 dCMisses++;
-                CheckL2();
+                if (openFile.L2TorF)
+                {
+                    CheckL2();
+                }
             }
             dataCacheInd = BinaryToHex(dataCache.index);
             dataCacheTag = BinaryToHex(dataCache.tag);
