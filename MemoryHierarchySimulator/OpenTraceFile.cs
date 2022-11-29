@@ -12,6 +12,7 @@ namespace MemoryHierarchySimulator
        public List<string> accessType = new List<string>();
        public List<string> hexAddress = new List<string>();
 
+        string lineReplace;
         public int arrayLength = 0;
         public int arrayMarker = 0;
         public string[] fileContents = null;
@@ -49,11 +50,11 @@ namespace MemoryHierarchySimulator
                 position = line.IndexOf(":");
                 if (position > 0)
                 {
+                    lineReplace = line.Replace("\r", "");
                     accessType.Add(line.Substring(0, position));
-                    hexAddress.Add(line.Substring(position + 1));
+                    hexAddress.Add(lineReplace.Substring(position + 1));
                 }
             }
-
 
         }
     }

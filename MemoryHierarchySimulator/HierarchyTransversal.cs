@@ -93,6 +93,7 @@ namespace MemoryHierarchySimulator
 
                     //physicalPageNumber = DecimalToHex(PageTable.PhysicalPageNumber);
                     physicalAddress = addr.PadLeft(openFile.PageOffSetBits / 4, '0');
+                    physicalAddress = physicalAddress.Replace("\r", "");
                     CheckdC();
                     PrintVirtualAddressesLine();
 
@@ -140,7 +141,6 @@ namespace MemoryHierarchySimulator
                     l2Result = "";
                     physicalAddress = "";
 
-                    
                     virtAddress = addr.PadLeft(8, '0');
                     virtPageNumber = GetPageNum(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits);
                     pageOffset = GetPageOff(virtAddress, openFile.PageOffSetBits, openFile.PageIndexBits);
@@ -171,6 +171,7 @@ namespace MemoryHierarchySimulator
         /// </summary>
         private void PrintVirtualAddressesLine()
         {
+ 
             Console.WriteLine("{0,-13} {1,-3} {2,-4} {3,-6} {4,-1} {5,-4} {6,-4} {7,-4} {8,-6} {9,-3} {10,-6} {11,-4} {12,-3} {13,-4}", virtAddress, virtPageNumber, pageOffset, tLBTag, tLBInd, tLBResult, pTResult,
                 physicalPageNumber, dataCacheTag, dataCacheInd, dataCacheResult, l2Tag, l2Ind, l2Result);
         }
@@ -345,7 +346,7 @@ namespace MemoryHierarchySimulator
         private string GetPageNum(string str, double offset, double index)
         {
             int length = 32 - (int)offset - (int)index;
-            str = HexToBinary(str);
+            str = HexToBinary(str);          
             str = str.Substring(length, (int)index);
             str = BinaryToHex(str);
             return str;
